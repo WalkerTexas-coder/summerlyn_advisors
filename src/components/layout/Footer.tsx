@@ -57,8 +57,8 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Get In Touch</h4>
             <p className="text-gray-400 mb-2">
-              Email: <a href="mailto:contact@summerlynagvisors.com" className="hover:text-white transition-colors">
-                contact@summerlynagvisors.com
+              Email: <a href="mailto:sales@summerlynadvisors.com" className="hover:text-white transition-colors">
+                sales@summerlynadvisors.com
               </a>
             </p>
             <div className="flex space-x-4 mt-4">

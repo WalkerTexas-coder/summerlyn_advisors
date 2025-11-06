@@ -41,10 +41,10 @@ export default function Contact() {
                   <div>
                     <h3 className="font-semibold text-gray-900 mb-2">Email</h3>
                     <a
-                      href="mailto:contact@summerlynagvisors.com"
+                      href="mailto:sales@summerlynadvisors.com"
                       className="text-primary-500 hover:text-primary-600"
                     >
-                      contact@summerlynagvisors.com
+                      sales@summerlynadvisors.com
                     </a>
                   </div>
                   <div>
