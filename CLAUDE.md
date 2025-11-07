@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Summerlyn Advisors** - A professional consulting website for fractional product management and technical product consulting, specializing in telehealth and healthcare technology.
 
+**Owner:** Austin Walker - Product Manager with experience across Rugiet, FightingWeight, CompoundLive, Teligant, and Hedfirst
+
 **Business Goal:** Attract contract positions and consulting clients in the healthcare/telehealth space.
 
 **Tech Stack:** React 18 + TypeScript + Vite + Tailwind CSS v3 + React Router v6
@@ -36,9 +38,9 @@ src/
 │   ├── home/          # Homepage sections (Hero, ValueProposition, ServicesOverview, WhyHealthcare)
 │   ├── services/      # Services page components (ServiceCard)
 │   └── about/         # About page components (currently integrated in page)
-├── pages/             # Page components (Home, Services, About, Contact)
-├── types/             # TypeScript type definitions (Service, Testimonial, CaseStudy)
-├── data/              # Static data (services, testimonials)
+├── pages/             # Page components (Home, Services, About, Resources, Article, Contact)
+├── types/             # TypeScript type definitions (Service, Testimonial, CaseStudy, Article, ImageAsset)
+├── data/              # Static data (services, testimonials, articles)
 ├── utils/             # Utility functions
 ├── hooks/             # Custom React hooks
 ├── routes.tsx         # React Router configuration
@@ -48,9 +50,12 @@ src/
 
 ## Key TypeScript Types
 
-**Service** - Product management service offerings (strategic planning, execution, go-to-market, healthcare specialization)
-**Testimonial** - Client testimonials and reviews
+**Service** - Product management service offerings (strategic planning, execution, go-to-market, telehealth platform development)
+**Testimonial** - Client testimonials and reviews (based on Teligant and Hedfirst experience)
 **CaseStudy** - Project case studies (for future implementation)
+**Article** - Blog posts, case studies, and thought leadership content
+**ArticleContent** - Content blocks for articles (headings, paragraphs, lists, highlights, stats)
+**ImageAsset** - Image library management with categories
 
 All types are exported from `src/types/index.ts` for easy importing.
 
@@ -74,8 +79,10 @@ All types are exported from `src/types/index.ts` for easy importing.
 
 1. **Home** (`/`) - Hero, value proposition, services overview, why healthcare section, CTA
 2. **Services** (`/services`) - Detailed service cards, engagement models
-3. **About** (`/about`) - Story, experience/expertise, working philosophy
-4. **Contact** (`/contact`) - Contact form with validation, contact info, FAQ teaser
+3. **About** (`/about`) - Austin Walker's story, career progression, experience/expertise, working philosophy
+4. **Resources** (`/resources`) - Case studies, guides, and thought leadership articles
+5. **Article** (`/resources/:slug`) - Individual article pages with full content
+6. **Contact** (`/contact`) - Contact form with validation, contact info, FAQ teaser
 
 ## Form Handling
 
@@ -86,14 +93,23 @@ Contact form uses **React Hook Form** for validation. Currently logs to console 
 
 Update form endpoint in `src/components/common/ContactForm.tsx`
 
-## Content Updates Needed
+## Content Status
 
-Search for these placeholders and replace with real content:
-- `[Owner Name]` - Consultant's name
-- `[Owner Email]` - Contact email
-- `[Owner LinkedIn]` - LinkedIn profile URL
-- `[Client Name]` - Client testimonials
-- Healthcare experience years and specific details
+### ✅ Completed
+- Owner name: Austin Walker (updated throughout site)
+- About page: Complete career progression from software engineer → solutions engineer → technical product lead → product manager
+- Services: Updated to emphasize telehealth platform development expertise
+- Testimonials: Added authentic testimonials based on Teligant and Hedfirst experience
+- Resources: 4 comprehensive articles created:
+  - Teligant case study (0→1 telehealth SaaS platform)
+  - Hedfirst case study (integrations & compliance)
+  - Complete guide to building telehealth platforms
+  - Telehealth integration strategy
+
+### ⚠️ Still Needed
+- LinkedIn profile URL (placeholder "#" in Contact.tsx:53 and Footer.tsx:65)
+- Professional photos/headshots
+- Contact form email integration (currently logs to console)
 
 ## Deployment
 
@@ -112,21 +128,41 @@ Search for these placeholders and replace with real content:
 vercel --prod
 ```
 
+## Resources Section
+
+The Resources section showcases Austin's expertise through detailed articles:
+
+**Article Structure:**
+- Each article has: id, title, slug, excerpt, category, date, readTime, content, tags
+- Categories: `case-study`, `thought-leadership`, `guide`
+- Content is built from ArticleContent blocks for flexible rendering
+
+**Current Articles:**
+1. **Teligant Case Study** - Building a 0→1 telehealth SaaS platform with 7 core capabilities
+2. **Hedfirst Case Study** - Managing LegitScript/SureScripts certification, Dosespot, pharmacy, and ShipStation integrations
+3. **Building Telehealth Platforms Guide** - Comprehensive 15-minute guide covering compliance, architecture, integrations
+4. **Telehealth Integration Strategy** - Deep dive into e-prescribing, pharmacy, and fulfillment integrations
+
+**To add more articles:**
+Edit `src/data/articles.ts` and add new Article objects following the existing pattern.
+
 ## Next Steps / Roadmap
 
 ### High Priority
-- [ ] Replace placeholder content with real information
+- [x] Replace placeholder content with real information ✅
+- [x] Add actual testimonials (based on real experience) ✅
+- [x] Create Resources/Blog section for thought leadership ✅
+- [ ] Add LinkedIn profile URL
 - [ ] Add professional photos/images
 - [ ] Connect contact form to email service (Formspree/Web3Forms)
-- [ ] Add actual client testimonials
 - [ ] Deploy to Vercel
 
 ### Medium Priority
-- [ ] Add Case Studies page with real examples
-- [ ] Create Resources/Blog section for thought leadership
 - [ ] Add Google Analytics tracking
 - [ ] Create environment variables file (`.env.local`)
 - [ ] Add loading states and error boundaries
+- [ ] Add more case studies and articles
+- [ ] Add social sharing for articles
 
 ### Nice to Have
 - [ ] Scroll animations with Framer Motion
@@ -135,6 +171,7 @@ vercel --prod
 - [ ] FAQ page with accordion component
 - [ ] Dark mode support
 - [ ] Performance optimizations (lazy loading, code splitting)
+- [ ] Article search and filtering
 
 ## TypeScript Best Practices
 
@@ -161,6 +198,12 @@ vercel --prod
 
 **Updating services:**
 Edit `src/data/services.ts` - automatically reflected on homepage and services page.
+
+**Adding a new article:**
+1. Add article object to `src/data/articles.ts`
+2. Define title, slug, excerpt, category, tags, and content blocks
+3. Article automatically appears on `/resources` page
+4. Article accessible at `/resources/[slug]`
 
 ## Git Workflow
 
