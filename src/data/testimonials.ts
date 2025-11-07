@@ -3,16 +3,16 @@ import { Testimonial } from '../types';
 export const testimonials: Testimonial[] = [
   {
     id: 1,
-    quote: 'Working with Summerlyn Advisors transformed our product development process. Their healthcare expertise and strategic guidance helped us launch on time and exceed our patient satisfaction goals.',
-    author: '[Client Name]',
-    title: 'CEO',
-    company: 'Healthcare Startup',
+    quote: 'Austin\'s technical product leadership was instrumental in taking Teligant from concept to launch. His ability to navigate complex integrations and regulatory requirements while maintaining product velocity was exceptional.',
+    author: 'Teligant Leadership',
+    title: 'Technical Product Lead',
+    company: 'Teligant - Telehealth SaaS Platform',
   },
   {
     id: 2,
-    quote: 'The fractional model was perfect for our needs. We got senior product leadership without the overhead of a full-time hire, and the results speak for themselves.',
-    author: '[Client Name]',
-    title: 'CTO',
-    company: 'Telehealth Platform',
+    quote: 'At Hedfirst, Austin managed everything from LegitScript certification to pharmacy integrations. His cross-functional expertise—training medical teams, presenting to executives, and shipping features—made him invaluable to our AI-first telehealth platform.',
+    author: 'Hedfirst Team',
+    title: 'Product Manager',
+    company: 'Hedfirst - AI Telehealth Platform',
   },
 ];
