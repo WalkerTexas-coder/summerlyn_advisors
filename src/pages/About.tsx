@@ -28,17 +28,23 @@ export default function About() {
         <div className="container-custom">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-6">
-              Why I Do This Work
+              Hi, I'm Austin Walker
             </h2>
             <div className="space-y-4 text-lg text-gray-700">
               <p>
-                Healthcare technology has the power to transform lives, but building successful healthcare products requires more than technical skill. It demands a deep understanding of clinical workflows, regulatory requirements, and the complex ecosystem of patients, providers, and payors.
+                I've spent my career building healthcare and telehealth products from the ground up. Starting as a software engineer working in Ruby on Rails for men's health companies like Rugiet and FightingWeight, I developed a deep understanding of how healthcare technology actually gets built.
               </p>
               <p>
-                With years of experience in telehealth and healthcare technology, I've seen firsthand how the right product leadership can make the difference between a product that merely functions and one that truly improves patient outcomes and drives business success.
+                As I moved into solutions engineering at CompoundLive, a telehealth SaaS platform, I learned how to bridge the gap between technical implementation and client needs—working both pre-sales and post-sales to ensure successful platform deployments.
               </p>
               <p>
-                My fractional approach allows me to bring senior product expertise to companies that need it most—startups and growing companies that aren't ready for a full-time product leader but need more than occasional consulting.
+                At Teligant, I took on my first technical product leadership role, taking a telehealth SaaS platform from concept to launch (0→1). This experience taught me how to build healthcare products that are both technically sound and commercially viable.
+              </p>
+              <p>
+                Most recently as Product Manager at Hedfirst, an AI-first telehealth company for complex diagnoses, I've handled the full spectrum of product challenges: achieving LegitScript and SureScripts certification, integrating with Dosespot, ShipStation, and pharmacy systems, training medical and sales teams, and presenting roadmaps to the C-suite.
+              </p>
+              <p>
+                Now through Summerlyn Advisors, I bring this unique combination of engineering depth, solutions expertise, and senior product leadership to healthcare companies that need experienced guidance without the full-time commitment.
               </p>
             </div>
           </div>
@@ -56,34 +62,34 @@ export default function About() {
               <div>
                 <h3 className="text-xl font-heading font-bold mb-4 text-primary-500">Healthcare Domain</h3>
                 <ul className="space-y-2 text-gray-700">
-                  <li>• Telehealth platforms</li>
-                  <li>• Remote patient monitoring</li>
-                  <li>• EHR/EMR integration</li>
-                  <li>• Patient engagement tools</li>
-                  <li>• Clinical decision support</li>
-                  <li>• HIPAA compliance</li>
+                  <li>• Direct-to-consumer telehealth</li>
+                  <li>• Men's health (ED, weight management)</li>
+                  <li>• Complex/hard-to-diagnose conditions</li>
+                  <li>• Compound medication platforms</li>
+                  <li>• LegitScript & SureScripts certification</li>
+                  <li>• Pharmacy integrations & workflows</li>
                 </ul>
               </div>
               <div>
                 <h3 className="text-xl font-heading font-bold mb-4 text-primary-500">Product Management</h3>
                 <ul className="space-y-2 text-gray-700">
-                  <li>• Product strategy & roadmapping</li>
-                  <li>• Agile/Scrum leadership</li>
-                  <li>• Cross-functional team management</li>
-                  <li>• Data-driven decision making</li>
-                  <li>• User research & validation</li>
-                  <li>• Go-to-market strategy</li>
+                  <li>• 0→1 product development</li>
+                  <li>• Roadmapping & C-suite presentations</li>
+                  <li>• Medical & sales team training</li>
+                  <li>• Cross-functional team leadership</li>
+                  <li>• Compliance & regulatory navigation</li>
+                  <li>• Pre & post-sales solutions</li>
                 </ul>
               </div>
               <div>
-                <h3 className="text-xl font-heading font-bold mb-4 text-primary-500">Technical Acumen</h3>
+                <h3 className="text-xl font-heading font-bold mb-4 text-primary-500">Technical Expertise</h3>
                 <ul className="space-y-2 text-gray-700">
-                  <li>• Healthcare tech stacks</li>
-                  <li>• FHIR & HL7 standards</li>
-                  <li>• API integrations</li>
-                  <li>• Security & compliance</li>
-                  <li>• Cloud infrastructure</li>
-                  <li>• Mobile health apps</li>
+                  <li>• Ruby on Rails development</li>
+                  <li>• Dosespot & pharmacy integrations</li>
+                  <li>• ShipStation & fulfillment systems</li>
+                  <li>• SureScripts e-prescribing</li>
+                  <li>• Telehealth SaaS platforms</li>
+                  <li>• AI-assisted diagnostics</li>
                 </ul>
               </div>
             </div>

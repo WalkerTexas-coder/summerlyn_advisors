@@ -132,7 +132,7 @@ export default function ContactForm() {
 
       {submitStatus === 'error' && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
-          Sorry, there was an error sending your message. Please try again or email me directly at contact@summerlynagvisors.com
+          Sorry, there was an error sending your message. Please try again or email me directly at sales@summerlynadvisors.com
         </div>
       )}
 
