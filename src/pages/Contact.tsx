@@ -7,7 +7,7 @@ export default function Contact() {
   return (
     <>
       <SEO title="Contact" description="Questions about Summerlyn Call Lists or advisory work? Get in touch." url="/contact" />
-      <PageHeader eyebrow="Contact" title={<>Let’s talk about <span className="serif-accent">your next 50 calls.</span></>}>
+      <PageHeader eyebrow="Contact" title={<>Let’s talk about <span className="serif-accent">your daily calls.</span></>}>
         Questions about Call Lists, a custom order, or advisory work. We reply within one business day.
       </PageHeader>
       <section className="container-x grid gap-10 lg:grid-cols-[2fr_1fr] pb-20">
