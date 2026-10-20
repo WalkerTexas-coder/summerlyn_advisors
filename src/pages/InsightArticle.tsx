@@ -24,6 +24,7 @@ export default function InsightArticle() {
               {s.heading && <h2>{s.heading}</h2>}
               {s.paragraphs?.map((p) => <p key={p}>{p}</p>)}
               {s.bullets && <ul>{s.bullets.map((b) => <li key={b}>{b}</li>)}</ul>}
+              {s.link && <p><Link to={s.link.to} className="text-brand-300 underline underline-offset-4 hover:text-white">{s.link.label}</Link></p>}
             </div>
           ))}
         </div>

@@ -7,7 +7,7 @@ export interface Insight {
   readMinutes: number;
   tag: 'Who to call' | 'What to say' | 'Timing' | 'Offer';
   quote?: string;
-  sections: { heading?: string; paragraphs?: string[]; bullets?: string[] }[];
+  sections: { heading?: string; paragraphs?: string[]; bullets?: string[]; link?: { to: string; label: string } }[];
 }
 
 export const insights: Insight[] = [
@@ -186,7 +186,7 @@ export const insights: Insight[] = [
         'Time delay: offer something they can see this week.',
         'Effort: make it 15 minutes, a one-site pilot, or a short note, not a “demo.”',
       ]},
-      { paragraphs: ['We used the same logic on our own pricing: a $199 starter plan you can cancel anytime, so the cost of finding out is small.'] },
+      { paragraphs: ['We used the same logic on our own pricing: Daily 2, two researched calls every weekday for $199/month, cancel anytime, so the cost of finding out is small.'], link: { to: '/signup?tier=daily2', label: 'Start Daily 2 · $199/mo →' } },
     ],
   },
 ];
