@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import type { PhotoCredit } from '../data/photoCredits';
 import { Link } from 'react-router-dom';
-import { faqs as defaultFaqs, Offer, offers, rushAddon, sampleRow, STRIPE_LINKS } from '../data/callListOffer';
+import { faqs as defaultFaqs, sampleRow, activeDailyTiers, daily5Steps, dailyCommonFeatures, DailyTier, SIGNUP_PATH } from '../data/callListOffer';
 
 export function PageHeader({ eyebrow, title, children }: { eyebrow: string; title: ReactNode; children?: ReactNode }) {
   return (
@@ -23,39 +23,56 @@ export function SectionHead({ eyebrow, title, body, center }: { eyebrow: string;
   );
 }
 
-const Check = () => (
-  <svg className="mt-1 h-4 w-4 flex-none text-cyan-300" viewBox="0 0 20 20" fill="currentColor"><path d="M7.6 13.2 4.4 10l-1.1 1.1 4.3 4.3 9-9-1.1-1.1z" /></svg>
-);
-
-function PriceCard({ o }: { o: Offer }) {
+export function DailyTiers() {
+  const tiers = activeDailyTiers();
   return (
-    <div className={`relative flex flex-col rounded-3xl p-8 ${o.featured ? 'bg-gradient-to-b from-brand-500/25 to-ink-900 border border-brand-400/50 shadow-[0_0_80px_-20px_rgba(139,92,246,.6)] md:-translate-y-3' : 'card'}`}>
-      {o.featured && <span className="absolute -top-3 left-8 rounded-full bg-white px-3 py-1 text-xs font-semibold text-ink-950">Most popular</span>}
-      <h3 className="text-lg font-semibold">{o.name}</h3>
-      <p className="text-sm text-zinc-400 mt-1">{o.tagline}</p>
-      <p className="mt-6 flex items-baseline gap-2"><span className="text-5xl font-semibold text-white">${o.price}</span><span className="text-zinc-500 text-sm">{o.cadence}</span></p>
-      <ul className="mt-6 space-y-3 text-sm flex-grow">
-        {o.features.map((f) => <li key={f} className="flex gap-3"><Check />{f}</li>)}
-      </ul>
-      <a href={o.href} className={`${o.featured ? 'btn-primary' : 'btn-ghost'} mt-8 w-full`}>{o.cta} →</a>
+    <div id="daily" className="relative scroll-mt-24 overflow-hidden rounded-3xl border border-cyan-400/30 bg-gradient-to-br from-cyan-400/10 via-ink-900/80 to-brand-500/10 p-6 md:p-10">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300 to-transparent" />
+      <div id="daily-5" className="text-center max-w-2xl mx-auto">
+        <span className="rounded-full border border-cyan-400/40 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-300">DAILY CALLS SUBSCRIPTION</span>
+        <h3 className="mt-4 text-3xl font-semibold text-white">Your calls, on your calendar, every weekday.</h3>
+        <p className="mt-3 text-zinc-400">Each weekday morning one email lands in your inbox with that day’s calendar invites. Accept them and your call blocks are booked: who to call, their number, why they were picked, why now, and a playbook for the call.</p>
+      </div>
+      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4 items-stretch">
+        {tiers.map((d) => <DailyTierCard key={d.id} d={d} />)}
+      </div>
+      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_1.1fr] items-center">
+        <ul className="space-y-2 text-sm text-zinc-300">{dailyCommonFeatures.map((f) => <li key={f} className="flex gap-2"><span className="text-cyan-300">✓</span>{f}</li>)}</ul>
+        <div className="rounded-2xl border border-white/10 bg-ink-950/70 p-5 shadow-2xl">
+          <p className="text-xs uppercase tracking-wider text-zinc-500 mb-3">Today’s email · Daily 5 · Tuesday</p>
+          {['8:30', '8:45', '9:00', '9:15', '9:30'].map((t, i) => (
+            <div key={t} className="mb-2 flex gap-3 rounded-xl border-l-2 border-cyan-300 bg-white/5 px-3 py-2">
+              <span className="w-12 shrink-0 text-xs text-zinc-500">{t}</span>
+              <div className="min-w-0">
+                <p className="text-sm text-white truncate">{i === 0 ? 'Call Dana Whitaker · Brightpath Clinics' : `Call #${i + 1} · high-target prospect`}</p>
+                <p className="text-xs text-zinc-500 truncate">{i === 0 ? '+1 (512) 555-0147 · Opening 2 new sites' : 'Phone · why selected · why now · playbook'}</p>
+              </div>
+            </div>
+          ))}
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">{daily5Steps.map((s) => <div key={s.n}><p className="text-xs text-cyan-300">{s.n}</p><p className="text-sm text-white">{s.title}</p><p className="text-xs text-zinc-500">{s.body}</p></div>)}</div>
+          <p className="mt-3 text-[11px] text-zinc-600">Example invites, fictional data.</p>
+        </div>
+      </div>
+      <p className="mt-6 text-center text-xs text-zinc-500">Billed monthly via Stripe. Cancel anytime; no contract.</p>
+    </div>
+  );
+}
+
+export function DailyTierCard({ d }: { d: DailyTier }) {
+  return (
+    <div className={`relative flex flex-col rounded-2xl border p-6 ${d.featured ? 'border-cyan-300 bg-cyan-400/10 shadow-xl shadow-cyan-500/10' : 'border-white/10 bg-ink-900/70'}`}>
+      {d.featured && <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-cyan-300 px-3 py-0.5 text-xs font-semibold text-ink-950">Most popular</span>}
+      <p className="text-white font-semibold">{d.name}</p>
+      <p className="mt-1 text-xs text-zinc-400 min-h-[2rem]">{d.tagline}</p>
+      <p className="mt-4 text-white"><span className="text-4xl font-semibold">${d.price!.toLocaleString()}</span><span className="text-zinc-400"> / {d.cadence}</span></p>
+      <ul className="mt-4 space-y-1 text-sm text-zinc-300 flex-1">{d.features.map((f) => <li key={f} className="flex gap-2"><span className="text-cyan-300">✓</span>{f}</li>)}</ul>
+      <Link to={`${SIGNUP_PATH}?tier=${d.id}`} className={`${d.featured ? 'btn-primary' : 'btn-ghost'} mt-6 justify-center`}>Sign up · {d.name} →</Link>
     </div>
   );
 }
 
 export function Pricing() {
-  return (
-    <div>
-      <div className="grid gap-6 md:grid-cols-3 items-stretch">{offers.map((o) => <PriceCard key={o.id} o={o} />)}</div>
-      <div className="card mt-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <p className="text-white font-semibold">{rushAddon.name} add-on · <span className="text-cyan-300">${rushAddon.price}</span></p>
-          <p className="text-sm text-zinc-400">{rushAddon.tagline} Purchase alongside any plan.</p>
-        </div>
-        <a href={STRIPE_LINKS.rush} className="btn-ghost">Add rush delivery →</a>
-      </div>
-      <p className="mt-6 text-center text-xs text-zinc-500">Secure checkout by Stripe. One-time payments, no subscription. Pilot is credited toward a Sprint within 14 days.</p>
-    </div>
-  );
+  return <DailyTiers />;
 }
 
 export function SampleRow() {
@@ -113,10 +130,10 @@ export function CTA() {
     <section className="container-x section">
       <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-brand-500/30 via-ink-900 to-cyan-400/10 px-6 py-16 md:p-20 text-center">
         <h2 className="h-section max-w-3xl mx-auto">Stop digging through the CRM. <span className="serif-accent">Start calling.</span></h2>
-        <p className="lead mt-5 max-w-xl mx-auto">50 researched contacts, a reason to call each one, and the words to say. In 3 business days.</p>
+        <p className="lead mt-5 max-w-xl mx-auto">Researched prospects, a reason to call each one, and the words to say. On your calendar every weekday morning.</p>
         <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
-          <a href={STRIPE_LINKS.sprint} className="btn-primary">Get my 50 calls · $399</a>
-          <a href={STRIPE_LINKS.pilot} className="btn-ghost">Try 15 for $99</a>
+          <Link to={SIGNUP_PATH} className="btn-primary">Sign up · from $199/mo</Link>
+          <Link to="/call-list#pricing" className="btn-ghost">Compare plans</Link>
         </div>
         <p className="mt-6 text-sm text-zinc-500">Questions first? <Link to="/contact" className="underline hover:text-white">Talk to us</Link>.</p>
       </div>

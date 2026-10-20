@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-import { CONTACT_EMAIL, STRIPE_LINKS } from '../data/callListOffer';
+import { CONTACT_EMAIL, SIGNUP_PATH } from '../data/callListOffer';
+import CookieConsent from './CookieConsent';
+import { openCookieSettings } from '../lib/consent';
+import IntroOfferPopup from './IntroOfferPopup';
 
 const nav = [
   { to: '/call-list', label: 'Call Lists' },
@@ -36,7 +39,7 @@ function Header() {
           {nav.map((n) => (
             <NavLink key={n.to} to={n.to} className={({ isActive }) => `transition hover:text-white ${isActive ? 'text-white' : 'text-zinc-400'}`}>{n.label}</NavLink>
           ))}
-          <a href={STRIPE_LINKS.sprint} className="btn-primary !py-2 !px-4">Get my calls</a>
+          <Link to={SIGNUP_PATH} className="btn-primary !py-2 !px-4">Sign up</Link>
         </nav>
         <button className="md:hidden text-white p-2" aria-label="Toggle menu" aria-expanded={open} onClick={() => setOpen(!open)}>
           <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">{open ? <path d="M5 5l12 12M17 5L5 17" /> : <path d="M3 6h16M3 11h16M3 16h16" />}</svg>
@@ -45,7 +48,7 @@ function Header() {
       {open && (
         <nav className="md:hidden container-x pb-6 flex flex-col gap-4 text-lg">
           {nav.map((n) => <NavLink key={n.to} to={n.to} className="text-zinc-300">{n.label}</NavLink>)}
-          <a href={STRIPE_LINKS.sprint} className="btn-primary mt-2">Get my 50 calls</a>
+          <Link to={SIGNUP_PATH} className="btn-primary mt-2">Sign up</Link>
         </nav>
       )}
     </header>
@@ -58,12 +61,13 @@ function Footer() {
       <div className="container-x py-14 grid gap-10 md:grid-cols-4 text-sm">
         <div className="md:col-span-2 space-y-4">
           <Logo />
-          <p className="max-w-sm text-zinc-500">Don’t lose time with CRMs. Know who to call and what to say. Researched, call-ready B2B prospects in 3 business days.</p>
+          <p className="max-w-sm text-zinc-500">Don’t lose time with CRMs. Know who to call and what to say. Researched, call-ready B2B prospects on your calendar every weekday.</p>
         </div>
         <div className="space-y-2">
           <p className="text-white font-medium mb-3">Product</p>
           <Link className="block text-zinc-400 hover:text-white" to="/call-list">Call Lists</Link>
           <Link className="block text-zinc-400 hover:text-white" to="/call-list#pricing">Pricing</Link>
+          <Link className="block text-zinc-400 hover:text-white" to={SIGNUP_PATH}>Sign up</Link>
           <Link className="block text-zinc-400 hover:text-white" to="/insights">Insights</Link>
         </div>
         <div className="space-y-2">
@@ -76,7 +80,12 @@ function Footer() {
       </div>
       <div className="container-x pb-10 text-xs text-zinc-600 space-y-2">
         <p>Summerlyn Call Lists is a service of Summerlyn Advisors LLC, a Texas limited liability company. We use publicly available business contact information. Buyers are responsible for complying with the TCPA, Do-Not-Call rules, and other telemarketing and email laws when contacting listed individuals.</p>
-        <p>© {new Date().getFullYear()} Summerlyn Advisors LLC. All rights reserved.</p>
+        <div className="flex flex-wrap gap-x-5 gap-y-2 text-zinc-400">
+          <Link to="/terms" className="hover:text-white">Terms of Service</Link>
+          <Link to="/privacy" className="hover:text-white">Privacy Policy</Link>
+          <button type="button" onClick={openCookieSettings} className="hover:text-white">Cookie settings</button>
+        </div>
+        <p>© {new Date().getFullYear()} Summerlyn Advisors LLC, Leander, Texas. All rights reserved.</p>
       </div>
     </footer>
   );
@@ -94,6 +103,8 @@ export default function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <IntroOfferPopup />
+      <CookieConsent />
     </div>
   );
 }
