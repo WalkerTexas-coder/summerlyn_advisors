@@ -1,5 +1,6 @@
 import SEO from '../components/SEO';
-import { CTA, PageHeader } from '../components/ui';
+import { CTA, PageHeader, Photo } from '../components/ui';
+import { photoCredits } from '../data/photoCredits';
 
 const pillars = [
   ['Healthcare domain', 'Direct-to-consumer telehealth, men’s health, complex diagnoses, compound medication platforms, LegitScript & SureScripts certification, pharmacy integrations.'],
@@ -18,7 +19,7 @@ export default function About() {
           <p>Along the way I watched great sales teams lose hours every week to the same problem: a CRM full of names and no idea who to call today or what to say. Summerlyn Call Lists is the fix. AI agents do the heavy research, and I review every list before it ships.</p>
           <p>Summerlyn Advisors LLC is a Texas limited liability company. Alongside Call Lists, we still offer <a href="/advisory" className="text-brand-300 underline">fractional product leadership</a> for healthcare and telehealth companies.</p>
         </div>
-        <div className="space-y-4">{pillars.map(([t, b]) => <div key={t} className="card"><h3 className="font-semibold">{t}</h3><p className="mt-2 text-sm text-zinc-400">{b}</p></div>)}</div>
+        <div className="space-y-4"><Photo photo={photoCredits.handshakeAgreement} className="aspect-[4/3]" />{pillars.map(([t, b]) => <div key={t} className="card"><h3 className="font-semibold">{t}</h3><p className="mt-2 text-sm text-zinc-400">{b}</p></div>)}</div>
       </section>
       <CTA />
     </>

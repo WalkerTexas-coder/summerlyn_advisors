@@ -1,5 +1,6 @@
 import SEO from '../components/SEO';
-import { CTA, FAQ, PageHeader, Pricing, SampleRow, SectionHead } from '../components/ui';
+import { CTA, FAQ, PageHeader, Photo, Pricing, SampleRow, SectionHead } from '../components/ui';
+import { photoCredits } from '../data/photoCredits';
 import { deliverables, howItWorks, STRIPE_LINKS } from '../data/callListOffer';
 
 const columns = ['Priority rank & fit score', 'Company, website, industry, size, HQ', 'Contact name, title & why this person', 'Phone, phone type, source & verified date', 'DNC status label', 'Email & status', 'Best time to call', 'Reason to call + source link + date', 'Opener', 'Talking points', 'Discovery question', 'Likely objection & response', 'Voicemail script', 'Follow-up email line', 'Research confidence & notes'];
@@ -16,11 +17,14 @@ export default function CallList() {
         </div>
       </PageHeader>
 
+      <div className="container-x"><Photo photo={photoCredits.focusedResearch} priority className="aspect-[16/7] md:aspect-[3/1]" imgClassName="object-[center_35%]" /></div>
+
       <section className="container-x section !pt-8"><SampleRow /></section>
 
       <section className="container-x section grid gap-12 lg:grid-cols-2">
         <div>
           <SectionHead eyebrow="The deliverable" title="What lands in your inbox" body="A Google Sheet (and CSV), a 1–2 page script sheet with your master talk track and top three objections, and a delivery note with method, DNC scrub date, and replacement instructions." />
+          <Photo photo={photoCredits.repOnPhone} className="mb-8 aspect-[16/9]" />
           <div className="space-y-4">{howItWorks.map((s) => <div key={s.n} className="flex gap-4"><span className="font-serif text-2xl text-brand-300">{s.n}</span><div><p className="text-white font-medium">{s.title}</p><p className="text-sm text-zinc-400">{s.body}</p></div></div>)}</div>
         </div>
         <div className="card">

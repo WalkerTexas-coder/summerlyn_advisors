@@ -1,4 +1,5 @@
 import { ReactNode, useState } from 'react';
+import type { PhotoCredit } from '../data/photoCredits';
 import { Link } from 'react-router-dom';
 import { faqs as defaultFaqs, Offer, offers, rushAddon, sampleRow, STRIPE_LINKS } from '../data/callListOffer';
 
@@ -120,5 +121,20 @@ export function CTA() {
         <p className="mt-6 text-sm text-zinc-500">Questions first? <Link to="/contact" className="underline hover:text-white">Talk to us</Link>.</p>
       </div>
     </section>
+  );
+}
+
+export function Photo({ photo, className = '', imgClassName = '', priority = false, overlay = 'bottom' }: { photo: PhotoCredit; className?: string; imgClassName?: string; priority?: boolean; overlay?: 'bottom' | 'left' | 'full' }) {
+  const overlays = {
+    bottom: 'bg-gradient-to-t from-ink-950 via-ink-950/40 to-brand-500/10',
+    left: 'bg-gradient-to-r from-ink-950/80 via-ink-950/30 to-transparent',
+    full: 'bg-gradient-to-br from-brand-500/25 via-ink-950/50 to-cyan-900/30',
+  };
+  return (
+    <figure className={`relative overflow-hidden rounded-3xl border border-white/10 ${className}`}>
+      <img src={photo.file} alt={photo.alt} loading={priority ? 'eager' : 'lazy'} decoding="async" className={`h-full w-full object-cover saturate-[.8] ${imgClassName}`} />
+      <div aria-hidden className={`pointer-events-none absolute inset-0 ${overlays[overlay]}`} />
+      <div aria-hidden className="pointer-events-none absolute inset-0 mix-blend-color bg-brand-500/15" />
+    </figure>
   );
 }

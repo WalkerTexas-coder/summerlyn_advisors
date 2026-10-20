@@ -15,7 +15,12 @@ export default function SEO({ title, description, url = '', type = 'website' }: 
       <meta property="og:url" content={full} />
       <meta property="og:type" content={type} />
       <meta property="og:site_name" content="Summerlyn Advisors" />
-      <meta name="twitter:card" content="summary" />
+      <meta property="og:image" content={`${siteUrl}/images/og-image.jpg`} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta property="og:image:alt" content="Sales professional on a call in a modern office" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:image" content={`${siteUrl}/images/og-image.jpg`} />
       <meta name="twitter:title" content={t} />
       <meta name="twitter:description" content={description} />
       <link rel="canonical" href={full} />
