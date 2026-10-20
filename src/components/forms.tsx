@@ -1,6 +1,5 @@
 import { FormEvent, useState } from 'react';
-import { CONTACT_EMAIL } from '../data/callListOffer';
-import { submitForm, SubmitResult } from '../lib/submitForm';
+import { submitForm } from '../lib/submitForm';
 
 type FieldDef = { name: string; label: string; type?: 'text' | 'email' | 'url' | 'textarea' | 'select' | 'file' | 'checkbox'; required?: boolean; placeholder?: string; options?: string[]; full?: boolean; rows?: number };
 
@@ -9,33 +8,28 @@ function GenericForm({ fields, endpoint, subject, hidden = {}, submitLabel, succ
 }) {
   const [values, setValues] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<'idle' | 'sending' | 'error'>('idle');
-  const [result, setResult] = useState<SubmitResult | null>(null);
-  const labels = Object.fromEntries([...fields.map((f) => [f.name, f.label]), ['session_id', 'Stripe session ID']]);
+  const [done, setDone] = useState(false);
+  const [fileError, setFileError] = useState('');
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (status === 'sending') return;
     setStatus('sending');
     try {
-      setResult(await submitForm(endpoint, subject, { ...values, ...hidden }, labels));
+      await submitForm(endpoint, subject, { ...values, ...hidden });
+      setDone(true);
       setStatus('idle');
     } catch {
       setStatus('error');
     }
   }
 
-  if (result) {
+  if (done) {
     return (
       <div className="card text-center py-14" role="status">
         <div className="mx-auto mb-5 grid h-14 w-14 place-items-center rounded-full bg-cyan-400/15 text-cyan-300 text-2xl">✓</div>
         <h3 className="text-2xl font-semibold">{successTitle}</h3>
-        {result.mode === 'endpoint' ? (
-          <p className="mt-3 text-zinc-400">We received your details and will confirm by email within one business day.</p>
-        ) : (
-          <p className="mt-3 text-zinc-400 max-w-md mx-auto">
-            Your email app should have opened with everything filled in. Just hit send. If nothing opened,{' '}
-            <a href={result.href} className="text-brand-300 underline">click here</a> or email <span className="text-white">{CONTACT_EMAIL}</span>.
-          </p>
-        )}
+        <p className="mt-3 text-zinc-400">We received your details and will confirm by email within one business day.</p>
       </div>
     );
   }
@@ -61,11 +55,18 @@ function GenericForm({ fields, endpoint, subject, hidden = {}, submitLabel, succ
               <input id={f.name} type="file" accept=".csv,.txt,.tsv" className="block w-full text-sm text-zinc-400 file:mr-4 file:rounded-full file:border-0 file:bg-white/10 file:px-4 file:py-2 file:text-white hover:file:bg-white/20"
                 onChange={async (e) => {
                   const file = e.target.files?.[0];
-                  if (!file) return;
-                  if (file.size > 500_000) { alert('Please keep uploads under 500 KB, or share a link instead.'); e.target.value = ''; return; }
+                  setFileError('');
+                  if (!file) { setValues((s) => ({ ...s, lead_file_csv: '', lead_file_name: '' })); return; }
+                  if (file.size > 500 * 1024) {
+                    setFileError(`That file is ${Math.ceil(file.size / 1024)} KB. Please keep uploads under 500 KB, or share a link instead.`);
+                    e.target.value = '';
+                    setValues((s) => ({ ...s, lead_file_csv: '', lead_file_name: '' }));
+                    return;
+                  }
                   const text = await file.text();
-                  setValues((s) => ({ ...s, [f.name]: `[${file.name}]\n${text}` }));
+                  setValues((s) => ({ ...s, lead_file_csv: text, lead_file_name: file.name }));
                 }} />
+              {fileError && <p className="mt-2 text-sm text-red-400" role="alert">{fileError}</p>}
               {f.placeholder && <p className="mt-2 text-xs text-zinc-500">{f.placeholder}</p>}
             </div>
           );
@@ -84,10 +85,10 @@ function GenericForm({ fields, endpoint, subject, hidden = {}, submitLabel, succ
         );
       })}
       <div className="md:col-span-2 flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
-        <p className="text-xs text-zinc-500 max-w-md">{endpoint ? 'Submitted securely.' : `Submitting opens your email app with this form prefilled to ${CONTACT_EMAIL}.`}</p>
+        <p className="text-xs text-zinc-500 max-w-md">Submitted securely.</p>
         <button type="submit" disabled={status === 'sending'} className="btn-primary disabled:opacity-60">{status === 'sending' ? 'Sending…' : submitLabel}</button>
       </div>
-      {status === 'error' && <p className="md:col-span-2 text-sm text-red-400">Something went wrong. Please try again or email {CONTACT_EMAIL}.</p>}
+      {status === 'error' && <p className="md:col-span-2 text-sm text-red-400">Sorry, we couldn’t send that just now. Please check your connection and try again in a moment.</p>}
     </form>
   );
 }
@@ -119,7 +120,10 @@ const onboardingFields: FieldDef[] = [
   { name: 'data_confirm', label: 'I confirm I lawfully hold any lead or customer data I share and may share it with Summerlyn (and its service providers, including AI providers) to deliver the service, as described in the Privacy Policy.', type: 'checkbox', required: true },
 ];
 
-export function IntakeForm({ sessionId, plan }: { sessionId: string; plan: string }) {
+export function IntakeForm({ sessionId: sid, plan: pl }: { sessionId: string; plan: string }) {
+  const q = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const plan = q?.get('plan') || pl || '';
+  const sessionId = q?.get('session_id') || sid || '';
   return <GenericForm fields={onboardingFields} endpoint={import.meta.env.VITE_INTAKE_FORM_ENDPOINT} subject={`Daily calls onboarding (${plan})${sessionId ? ` · ${sessionId}` : ''}`} hidden={{ session_id: sessionId, plan }} submitLabel="Start my daily calls →" successTitle="You’re set. Your first invites are on the way." />;
 }
 
