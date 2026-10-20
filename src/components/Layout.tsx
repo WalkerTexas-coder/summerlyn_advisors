@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { CONTACT_EMAIL, STRIPE_LINKS } from '../data/callListOffer';
+import IntroOfferPopup from './IntroOfferPopup';
 
 const nav = [
   { to: '/call-list', label: 'Call Lists' },
@@ -94,6 +95,7 @@ export default function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <IntroOfferPopup />
     </div>
   );
 }
