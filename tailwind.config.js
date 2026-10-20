@@ -10,6 +10,7 @@ export default {
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Fraunces', 'Georgia', 'serif'],
         serif: ['"Instrument Serif"', 'Georgia', 'serif'],
       },
       keyframes: {

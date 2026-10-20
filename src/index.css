@@ -23,6 +23,10 @@
   .card { @apply rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8 backdrop-blur; }
   .input { @apply w-full rounded-xl border border-white/10 bg-ink-900 px-4 py-3 text-white placeholder-zinc-500 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30; }
   .label { @apply block text-sm font-medium text-zinc-300 mb-1.5; }
+  .kicker { @apply text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-400; font-variant-caps: all-small-caps; }
+  .sec-num { @apply font-display text-sm italic text-brand-300; }
+  .rule { @apply border-t border-white/15; }
+  .h-ed { @apply font-display font-light text-white leading-[1.05] tracking-[-0.02em]; }
   .prose-x p { @apply mb-5 leading-relaxed text-zinc-300 text-lg; }
   .prose-x h2 { @apply mt-10 mb-4 text-2xl font-semibold; }
   .prose-x ul { @apply mb-5 list-disc pl-6 space-y-2 text-zinc-300 text-lg; }
