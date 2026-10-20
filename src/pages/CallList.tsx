@@ -38,7 +38,7 @@ export default function CallList() {
       </section>
 
       <section id="pricing" className="container-x section scroll-mt-20">
-        <SectionHead center eyebrow="Pricing" title={<>Simple, <span className="serif-accent">one-time</span> pricing.</>} />
+        <SectionHead center eyebrow="Pricing" title={<>Simple pricing. <span className="serif-accent">Daily calls or one-time lists.</span></>} />
         <Pricing />
       </section>
 

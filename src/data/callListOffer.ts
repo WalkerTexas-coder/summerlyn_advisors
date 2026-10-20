@@ -20,6 +20,10 @@ export const STRIPE_LINKS = {
   pilot: env.VITE_STRIPE_LINK_PILOT || 'https://buy.stripe.com/test_fZu7sL90j9B0ajS38K5EY01',
   prioritize: env.VITE_STRIPE_LINK_PRIORITIZE || 'https://buy.stripe.com/test_dRm3cvgsLdRg2Rq9x85EY02',
   rush: env.VITE_STRIPE_LINK_RUSH || 'https://buy.stripe.com/test_dRmbJ14K3eVkbnW24G5EY03',
+  daily2: env.VITE_STRIPE_LINK_DAILY2 || 'https://buy.stripe.com/test_28E8wPb8r7sSeA8aBc5EY05',
+  daily10: env.VITE_STRIPE_LINK_DAILY10 || 'https://buy.stripe.com/test_8x2fZh4K37sS77GcJk5EY06',
+  daily20: env.VITE_STRIPE_LINK_DAILY20 || 'https://buy.stripe.com/test_28E14n0tN7sS3Vu24G5EY07',
+  daily5: env.VITE_STRIPE_LINK_DAILY5 || 'https://buy.stripe.com/test_3cIdR94K300qdw424G5EY04',
 };
 
 export const offers: Offer[] = [
@@ -96,4 +100,52 @@ export const icpPoints = [
   { title: 'The right connection', body: 'Not the company, the person. The operator who owns the problem you solve, with the authority to act on it. We map titles to pain, not titles to org charts.' },
   { title: 'The right timing', body: 'A new location, a hiring spree, a funding round, a leadership change. Triggers open a window. We find the window and date it, so your call lands while it matters.' },
   { title: 'The right words', body: 'A reason that is about them, not you. Every opener references the trigger, names a likely problem, and asks one easy question.' },
+];
+
+export interface DailyTier {
+  featured?: boolean;
+  id: string;
+  name: string;
+  callsPerDay: number;
+  price: number | null; // monthly USD; null = pricing pending (hidden from site)
+  href: string;
+  tagline: string;
+  features: string[];
+  cta: string;
+  cadence: string;
+}
+
+// Daily-calls subscription tiers. Add a tier here (plus its Stripe link) to show it on the site.
+// Daily-calls subscription tiers. Add a tier here (plus its Stripe link) to show it on the site.
+// Tiers with price === null are hidden.
+export const dailyCommonFeatures = [
+  'One email each weekday with that day’s calendar invites',
+  'Each invite: name, phone, why they were selected, reason to call now',
+  'Call playbook: opener, discovery questions, objection handling, the ask',
+  'Mon–Fri, skipping US federal holidays',
+  'Never repeats a contact · bad numbers replaced',
+  'Cancel anytime',
+];
+
+const tier = (id: string, calls: number, price: number, href: string, tagline: string, featured = false): DailyTier => ({
+  id, name: `Daily ${calls}`, callsPerDay: calls, price, href, tagline, featured, cadence: 'month',
+  cta: `Start Daily ${calls}`,
+  features: [`${calls} high-target calls every weekday`, `About ${calls * 21} researched contacts a month`],
+});
+
+export const dailyTiers: DailyTier[] = [
+  tier('daily2', 2, 199, STRIPE_LINKS.daily2, 'For founders who sell between everything else.'),
+  tier('daily5', 5, 499, STRIPE_LINKS.daily5, 'A focused hour of calls every morning.', true),
+  tier('daily10', 10, 899, STRIPE_LINKS.daily10, 'For a full-time rep’s prospecting block.'),
+  tier('daily20', 20, 1599, STRIPE_LINKS.daily20, 'Keep a small team’s pipeline full.'),
+];
+export const daily5Plan = dailyTiers[1];
+
+
+export const activeDailyTiers = () => dailyTiers.filter((t) => t.price !== null);
+
+export const daily5Steps = [
+  { n: '01', title: 'Subscribe', body: 'Check out once through Stripe. Billed monthly, cancel anytime.' },
+  { n: '02', title: 'Tell us your ICP', body: 'Your calendar email, timezone, preferred delivery time, and who you want to reach.' },
+  { n: '03', title: 'Open your calendar', body: 'Each weekday, one email lands with your call invites: who, their number, why they were picked, why now, and a call playbook. Accept and they’re on your calendar.' },
 ];

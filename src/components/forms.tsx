@@ -82,7 +82,25 @@ const intakeFields: FieldDef[] = [
   { name: 'notes', label: 'Notes', type: 'textarea', rows: 3, placeholder: 'Customers or competitors to exclude, proof points we can use, anything else' },
 ];
 
-export function IntakeForm({ sessionId }: { sessionId: string }) {
+const subscriberFields: FieldDef[] = [
+  { name: 'name', label: 'Your name', required: true },
+  { name: 'email', label: 'Email (billing / contact)', type: 'email', required: true },
+  { name: 'calendar_email', label: 'Calendar email for invites', type: 'email', required: true, placeholder: 'Where the daily call invites should land' },
+  { name: 'timezone', label: 'Timezone', type: 'select', required: true, options: ['Eastern (ET)', 'Central (CT)', 'Mountain (MT)', 'Arizona (MST, no DST)', 'Pacific (PT)', 'Alaska (AKT)', 'Hawaii (HST)', 'Other (add in notes)'] },
+  { name: 'delivery_time', label: 'Preferred delivery time', type: 'select', required: true, options: ['7:00 a.m.', '7:30 a.m.', '8:00 a.m.', '8:30 a.m.', '9:00 a.m.', 'Evening before (5:00 p.m.)'] },
+  { name: 'call_window', label: 'Preferred call block start', placeholder: 'e.g. 9:00 a.m., 15-min slots' },
+  { name: 'company', label: 'Company', required: true },
+  { name: 'website', label: 'Website', type: 'url', placeholder: 'https://' },
+  { name: 'what_you_sell', label: 'What you sell', type: 'textarea', required: true, rows: 3, placeholder: 'Your product or service, and the problem it solves' },
+  { name: 'ideal_customer', label: 'Ideal customer (ICP)', type: 'textarea', required: true, rows: 3, placeholder: 'Industry, company size, titles you sell to, triggers that signal they need you, who to exclude' },
+  { name: 'territory', label: 'Territory', placeholder: 'e.g. Texas, US Central time zone, nationwide' },
+  { name: 'notes', label: 'Exclusions & notes', type: 'textarea', rows: 3, placeholder: 'Current customers, competitors, or accounts never to send' },
+];
+
+export function IntakeForm({ sessionId, plan }: { sessionId: string; plan?: string }) {
+  if (plan) {
+    return <GenericForm fields={subscriberFields} endpoint={import.meta.env.VITE_INTAKE_FORM_ENDPOINT} subject={`Daily calls subscriber intake (${plan})${sessionId ? ` · ${sessionId}` : ''}`} hidden={{ session_id: sessionId, plan }} submitLabel="Start my daily calls →" successTitle="You're set. Your first invites are on the way." />;
+  }
   return <GenericForm fields={intakeFields} endpoint={import.meta.env.VITE_INTAKE_FORM_ENDPOINT} subject={`Call List intake${sessionId ? ` · ${sessionId}` : ''}`} hidden={{ session_id: sessionId }} submitLabel="Send my brief →" successTitle="Brief received. Your list is underway." />;
 }
 

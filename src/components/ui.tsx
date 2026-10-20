@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import type { PhotoCredit } from '../data/photoCredits';
 import { Link } from 'react-router-dom';
-import { faqs as defaultFaqs, Offer, offers, rushAddon, sampleRow, STRIPE_LINKS } from '../data/callListOffer';
+import { faqs as defaultFaqs, Offer, offers, rushAddon, sampleRow, STRIPE_LINKS, activeDailyTiers, daily5Steps, dailyCommonFeatures, DailyTier } from '../data/callListOffer';
 
 export function PageHeader({ eyebrow, title, children }: { eyebrow: string; title: ReactNode; children?: ReactNode }) {
   return (
@@ -42,6 +42,54 @@ function PriceCard({ o }: { o: Offer }) {
   );
 }
 
+export function DailyTiers() {
+  const tiers = activeDailyTiers();
+  return (
+    <div id="daily" className="relative mt-10 scroll-mt-24 overflow-hidden rounded-3xl border border-cyan-400/30 bg-gradient-to-br from-cyan-400/10 via-ink-900/80 to-brand-500/10 p-6 md:p-10">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300 to-transparent" />
+      <div id="daily-5" className="text-center max-w-2xl mx-auto">
+        <span className="rounded-full border border-cyan-400/40 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-300">NEW · DAILY CALLS SUBSCRIPTION</span>
+        <h3 className="mt-4 text-3xl font-semibold text-white">Your calls, on your calendar, every weekday.</h3>
+        <p className="mt-3 text-zinc-400">Each weekday morning one email lands in your inbox with that day’s calendar invites. Accept them and your call blocks are booked: who to call, their number, why they were picked, why now, and a playbook for the call.</p>
+      </div>
+      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4 items-stretch">
+        {tiers.map((d) => <DailyTierCard key={d.id} d={d} />)}
+      </div>
+      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_1.1fr] items-center">
+        <ul className="space-y-2 text-sm text-zinc-300">{dailyCommonFeatures.map((f) => <li key={f} className="flex gap-2"><span className="text-cyan-300">✓</span>{f}</li>)}</ul>
+        <div className="rounded-2xl border border-white/10 bg-ink-950/70 p-5 shadow-2xl">
+          <p className="text-xs uppercase tracking-wider text-zinc-500 mb-3">Today’s email · Daily 5 · Tuesday</p>
+          {['8:30', '8:45', '9:00', '9:15', '9:30'].map((t, i) => (
+            <div key={t} className="mb-2 flex gap-3 rounded-xl border-l-2 border-cyan-300 bg-white/5 px-3 py-2">
+              <span className="w-12 shrink-0 text-xs text-zinc-500">{t}</span>
+              <div className="min-w-0">
+                <p className="text-sm text-white truncate">{i === 0 ? 'Call Dana Whitaker · Brightpath Clinics' : `Call #${i + 1} · high-target prospect`}</p>
+                <p className="text-xs text-zinc-500 truncate">{i === 0 ? '+1 (512) 555-0147 · Opening 2 new sites' : 'Phone · why selected · why now · playbook'}</p>
+              </div>
+            </div>
+          ))}
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">{daily5Steps.map((s) => <div key={s.n}><p className="text-xs text-cyan-300">{s.n}</p><p className="text-sm text-white">{s.title}</p><p className="text-xs text-zinc-500">{s.body}</p></div>)}</div>
+          <p className="mt-3 text-[11px] text-zinc-600">Example invites, fictional data.</p>
+        </div>
+      </div>
+      <p className="mt-6 text-center text-xs text-zinc-500">Billed monthly via Stripe. Cancel anytime; no contract.</p>
+    </div>
+  );
+}
+
+export function DailyTierCard({ d }: { d: DailyTier }) {
+  return (
+    <div className={`relative flex flex-col rounded-2xl border p-6 ${d.featured ? 'border-cyan-300 bg-cyan-400/10 shadow-xl shadow-cyan-500/10' : 'border-white/10 bg-ink-900/70'}`}>
+      {d.featured && <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-cyan-300 px-3 py-0.5 text-xs font-semibold text-ink-950">Most popular</span>}
+      <p className="text-white font-semibold">{d.name}</p>
+      <p className="mt-1 text-xs text-zinc-400 min-h-[2rem]">{d.tagline}</p>
+      <p className="mt-4 text-white"><span className="text-4xl font-semibold">${d.price!.toLocaleString()}</span><span className="text-zinc-400"> / {d.cadence}</span></p>
+      <ul className="mt-4 space-y-1 text-sm text-zinc-300 flex-1">{d.features.map((f) => <li key={f} className="flex gap-2"><span className="text-cyan-300">✓</span>{f}</li>)}</ul>
+      <a href={d.href} className={`${d.featured ? 'btn-primary' : 'btn-ghost'} mt-6 justify-center`}>{d.cta} →</a>
+    </div>
+  );
+}
+
 export function Pricing() {
   return (
     <div>
@@ -53,7 +101,8 @@ export function Pricing() {
         </div>
         <a href={STRIPE_LINKS.rush} className="btn-ghost">Add rush delivery →</a>
       </div>
-      <p className="mt-6 text-center text-xs text-zinc-500">Secure checkout by Stripe. One-time payments, no subscription. Pilot is credited toward a Sprint within 14 days.</p>
+      <DailyTiers />
+      <p className="mt-6 text-center text-xs text-zinc-500">Secure checkout by Stripe. Lists are one-time payments; Daily plans are monthly subscriptions. Pilot is credited toward a Sprint within 14 days.</p>
     </div>
   );
 }
