@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import SEO from '../components/SEO';
-import { CTA, FAQ, Pricing, SampleRow, SectionHead } from '../components/ui';
+import { CTA, FAQ, Photo, Pricing, SampleRow, SectionHead } from '../components/ui';
+import { photoCredits } from '../data/photoCredits';
 import { deliverables, howItWorks, icpPoints, STRIPE_LINKS } from '../data/callListOffer';
 import { insights } from '../data/insights';
 
@@ -25,10 +26,15 @@ export default function Home() {
           </div>
           <p className="mt-5 text-xs text-zinc-500">No software. No seats. No annual contract. Or <a href={STRIPE_LINKS.pilot} className="underline hover:text-white">try 15 for $99</a>.</p>
         </div>
+        <div className="relative mt-16 md:mt-20 animate-fadeUp">
+          <div aria-hidden className="absolute -inset-6 -z-10 rounded-[2.5rem] bg-gradient-to-r from-brand-500/20 via-transparent to-cyan-400/20 blur-3xl" />
+          <Photo photo={photoCredits.heroSalesCall} priority className="aspect-[16/9] md:aspect-[21/9] shadow-2xl shadow-brand-500/10" imgClassName="object-[center_30%]" />
+        </div>
       </section>
 
       <section className="container-x section border-t border-white/5">
         <SectionHead eyebrow="How it works" title={<>Three steps. <span className="serif-accent">Zero CRM archaeology.</span></>} />
+        <Photo photo={photoCredits.teamStrategy} overlay="full" className="mb-8 aspect-[16/7] md:aspect-[3/1]" />
         <div className="grid gap-6 md:grid-cols-3">
           {howItWorks.map((s) => (
             <div key={s.n} className="card group hover:border-brand-400/40 transition">
@@ -57,6 +63,7 @@ export default function Home() {
             <p className="eyebrow mb-4">Ideal customer profiles</p>
             <h2 className="h-section">The right connection.<br /><span className="serif-accent">The right timing.</span></h2>
             <p className="lead mt-6">A great ICP isn’t a list of industries. It’s a person with a problem, at the moment the problem becomes urgent. That intersection is where calls turn into meetings, and it’s what we research for every contact.</p>
+            <Photo photo={photoCredits.founderLaptopCall} className="mt-10 aspect-[4/3]" />
           </div>
           <div className="space-y-5">
             {icpPoints.map((p, i) => (

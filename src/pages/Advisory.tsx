@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import SEO from '../components/SEO';
-import { PageHeader } from '../components/ui';
+import { PageHeader, Photo } from '../components/ui';
+import { photoCredits } from '../data/photoCredits';
 import { services } from '../data/services';
 
 export default function Advisory() {
@@ -10,6 +11,7 @@ export default function Advisory() {
       <PageHeader eyebrow="Summerlyn Advisory" title={<>Fractional product leadership for <span className="serif-accent">healthcare & telehealth.</span></>}>
         Senior product and go-to-market leadership without the full-time hire, from LegitScript and SureScripts certification to 0→1 launches.
       </PageHeader>
+      <div className="container-x pb-12"><Photo photo={photoCredits.dealHandshake} overlay="left" className="aspect-[16/7] md:aspect-[3/1]" /></div>
       <section className="container-x grid gap-6 md:grid-cols-2 pb-20">
         {services.map((s) => (
           <div key={s.id} className="card">
