@@ -3,33 +3,28 @@
 @tailwind utilities;
 
 @layer base {
-  html {
-    @apply scroll-smooth;
-  }
-
-  body {
-    @apply font-sans text-gray-900 antialiased;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-heading font-semibold;
-  }
+  html { @apply scroll-smooth bg-ink-950; }
+  body { @apply font-sans text-zinc-300 antialiased bg-ink-950; }
+  h1, h2, h3, h4 { @apply text-white tracking-tight; }
+  ::selection { @apply bg-brand-500/40 text-white; }
 }
 
 @layer components {
-  .btn-primary {
-    @apply bg-primary-500 hover:bg-primary-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200;
-  }
-
-  .btn-secondary {
-    @apply bg-transparent border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200;
-  }
-
-  .card {
-    @apply bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-200 p-6;
-  }
-
-  .container-custom {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
+  .container-x { @apply max-w-6xl mx-auto px-5 sm:px-8; }
+  .section { @apply py-20 md:py-28; }
+  .eyebrow { @apply text-xs font-semibold uppercase tracking-[0.2em] text-brand-300; }
+  .h-display { @apply text-4xl sm:text-5xl md:text-7xl font-semibold leading-[1.02]; }
+  .h-section { @apply text-3xl md:text-5xl font-semibold leading-tight; }
+  .serif-accent { @apply font-serif italic font-normal bg-gradient-to-r from-brand-300 to-cyan-300 bg-clip-text text-transparent; }
+  .lead { @apply text-lg md:text-xl text-zinc-400 leading-relaxed; }
+  .btn { @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition duration-200; }
+  .btn-primary { @apply btn bg-white text-ink-950 hover:bg-brand-300 shadow-[0_0_40px_-10px_rgba(167,139,250,.7)]; }
+  .btn-ghost { @apply btn border border-white/15 text-white hover:border-white/40 hover:bg-white/5; }
+  .card { @apply rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-8 backdrop-blur; }
+  .input { @apply w-full rounded-xl border border-white/10 bg-ink-900 px-4 py-3 text-white placeholder-zinc-500 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/30; }
+  .label { @apply block text-sm font-medium text-zinc-300 mb-1.5; }
+  .prose-x p { @apply mb-5 leading-relaxed text-zinc-300 text-lg; }
+  .prose-x h2 { @apply mt-10 mb-4 text-2xl font-semibold; }
+  .prose-x ul { @apply mb-5 list-disc pl-6 space-y-2 text-zinc-300 text-lg; }
+  .prose-x blockquote { @apply my-8 border-l-2 border-brand-400 pl-5 font-serif text-2xl italic text-white; }
 }
