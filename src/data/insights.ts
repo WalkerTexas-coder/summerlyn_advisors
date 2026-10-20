@@ -186,7 +186,7 @@ export const insights: Insight[] = [
         'Time delay: offer something they can see this week.',
         'Effort: make it 15 minutes, a one-site pilot, or a short note, not a “demo.”',
       ]},
-      { paragraphs: ['We used the same logic on our own pricing: a $99 pilot, credited toward a Sprint, so the cost of finding out is small.'] },
+      { paragraphs: ['We used the same logic on our own pricing: a $199 starter plan you can cancel anytime, so the cost of finding out is small.'] },
     ],
   },
 ];

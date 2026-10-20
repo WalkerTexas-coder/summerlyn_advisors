@@ -1,7 +1,7 @@
 import { ReactNode, useState } from 'react';
 import type { PhotoCredit } from '../data/photoCredits';
 import { Link } from 'react-router-dom';
-import { faqs as defaultFaqs, Offer, offers, rushAddon, sampleRow, STRIPE_LINKS, activeDailyTiers, daily5Steps, dailyCommonFeatures, DailyTier } from '../data/callListOffer';
+import { faqs as defaultFaqs, sampleRow, activeDailyTiers, daily5Steps, dailyCommonFeatures, DailyTier, SIGNUP_PATH } from '../data/callListOffer';
 
 export function PageHeader({ eyebrow, title, children }: { eyebrow: string; title: ReactNode; children?: ReactNode }) {
   return (
@@ -23,32 +23,13 @@ export function SectionHead({ eyebrow, title, body, center }: { eyebrow: string;
   );
 }
 
-const Check = () => (
-  <svg className="mt-1 h-4 w-4 flex-none text-cyan-300" viewBox="0 0 20 20" fill="currentColor"><path d="M7.6 13.2 4.4 10l-1.1 1.1 4.3 4.3 9-9-1.1-1.1z" /></svg>
-);
-
-function PriceCard({ o }: { o: Offer }) {
-  return (
-    <div className={`relative flex flex-col rounded-3xl p-8 ${o.featured ? 'bg-gradient-to-b from-brand-500/25 to-ink-900 border border-brand-400/50 shadow-[0_0_80px_-20px_rgba(139,92,246,.6)] md:-translate-y-3' : 'card'}`}>
-      {o.featured && <span className="absolute -top-3 left-8 rounded-full bg-white px-3 py-1 text-xs font-semibold text-ink-950">Most popular</span>}
-      <h3 className="text-lg font-semibold">{o.name}</h3>
-      <p className="text-sm text-zinc-400 mt-1">{o.tagline}</p>
-      <p className="mt-6 flex items-baseline gap-2"><span className="text-5xl font-semibold text-white">${o.price}</span><span className="text-zinc-500 text-sm">{o.cadence}</span></p>
-      <ul className="mt-6 space-y-3 text-sm flex-grow">
-        {o.features.map((f) => <li key={f} className="flex gap-3"><Check />{f}</li>)}
-      </ul>
-      <a href={o.href} className={`${o.featured ? 'btn-primary' : 'btn-ghost'} mt-8 w-full`}>{o.cta} →</a>
-    </div>
-  );
-}
-
 export function DailyTiers() {
   const tiers = activeDailyTiers();
   return (
-    <div id="daily" className="relative mt-10 scroll-mt-24 overflow-hidden rounded-3xl border border-cyan-400/30 bg-gradient-to-br from-cyan-400/10 via-ink-900/80 to-brand-500/10 p-6 md:p-10">
+    <div id="daily" className="relative scroll-mt-24 overflow-hidden rounded-3xl border border-cyan-400/30 bg-gradient-to-br from-cyan-400/10 via-ink-900/80 to-brand-500/10 p-6 md:p-10">
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300 to-transparent" />
       <div id="daily-5" className="text-center max-w-2xl mx-auto">
-        <span className="rounded-full border border-cyan-400/40 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-300">NEW · DAILY CALLS SUBSCRIPTION</span>
+        <span className="rounded-full border border-cyan-400/40 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-300">DAILY CALLS SUBSCRIPTION</span>
         <h3 className="mt-4 text-3xl font-semibold text-white">Your calls, on your calendar, every weekday.</h3>
         <p className="mt-3 text-zinc-400">Each weekday morning one email lands in your inbox with that day’s calendar invites. Accept them and your call blocks are booked: who to call, their number, why they were picked, why now, and a playbook for the call.</p>
       </div>
@@ -85,26 +66,13 @@ export function DailyTierCard({ d }: { d: DailyTier }) {
       <p className="mt-1 text-xs text-zinc-400 min-h-[2rem]">{d.tagline}</p>
       <p className="mt-4 text-white"><span className="text-4xl font-semibold">${d.price!.toLocaleString()}</span><span className="text-zinc-400"> / {d.cadence}</span></p>
       <ul className="mt-4 space-y-1 text-sm text-zinc-300 flex-1">{d.features.map((f) => <li key={f} className="flex gap-2"><span className="text-cyan-300">✓</span>{f}</li>)}</ul>
-      <a href={d.href} className={`${d.featured ? 'btn-primary' : 'btn-ghost'} mt-6 justify-center`}>{d.cta} →</a>
+      <Link to={`${SIGNUP_PATH}?tier=${d.id}`} className={`${d.featured ? 'btn-primary' : 'btn-ghost'} mt-6 justify-center`}>Sign up · {d.name} →</Link>
     </div>
   );
 }
 
 export function Pricing() {
-  return (
-    <div>
-      <div className="grid gap-6 md:grid-cols-3 items-stretch">{offers.map((o) => <PriceCard key={o.id} o={o} />)}</div>
-      <div className="card mt-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <p className="text-white font-semibold">{rushAddon.name} add-on · <span className="text-cyan-300">${rushAddon.price}</span></p>
-          <p className="text-sm text-zinc-400">{rushAddon.tagline} Purchase alongside any plan.</p>
-        </div>
-        <a href={STRIPE_LINKS.rush} className="btn-ghost">Add rush delivery →</a>
-      </div>
-      <DailyTiers />
-      <p className="mt-6 text-center text-xs text-zinc-500">Secure checkout by Stripe. Lists are one-time payments; Daily plans are monthly subscriptions. Pilot is credited toward a Sprint within 14 days.</p>
-    </div>
-  );
+  return <DailyTiers />;
 }
 
 export function SampleRow() {
@@ -162,10 +130,10 @@ export function CTA() {
     <section className="container-x section">
       <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-brand-500/30 via-ink-900 to-cyan-400/10 px-6 py-16 md:p-20 text-center">
         <h2 className="h-section max-w-3xl mx-auto">Stop digging through the CRM. <span className="serif-accent">Start calling.</span></h2>
-        <p className="lead mt-5 max-w-xl mx-auto">50 researched contacts, a reason to call each one, and the words to say. In 3 business days.</p>
+        <p className="lead mt-5 max-w-xl mx-auto">Researched prospects, a reason to call each one, and the words to say. On your calendar every weekday morning.</p>
         <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
-          <a href={STRIPE_LINKS.sprint} className="btn-primary">Get my 50 calls · $399</a>
-          <a href={STRIPE_LINKS.pilot} className="btn-ghost">Try 15 for $99</a>
+          <Link to={SIGNUP_PATH} className="btn-primary">Sign up · from $199/mo</Link>
+          <Link to="/call-list#pricing" className="btn-ghost">Compare plans</Link>
         </div>
         <p className="mt-6 text-sm text-zinc-500">Questions first? <Link to="/contact" className="underline hover:text-white">Talk to us</Link>.</p>
       </div>

@@ -1,19 +1,20 @@
 import SEO from '../components/SEO';
 import { CTA, FAQ, PageHeader, Photo, Pricing, SampleRow, SectionHead } from '../components/ui';
 import { photoCredits } from '../data/photoCredits';
-import { deliverables, howItWorks, STRIPE_LINKS } from '../data/callListOffer';
+import { Link } from 'react-router-dom';
+import { deliverables, howItWorks, SIGNUP_PATH } from '../data/callListOffer';
 
-const columns = ['Priority rank & fit score', 'Company, website, industry, size, HQ', 'Contact name, title & why this person', 'Phone, phone type, source & verified date', 'DNC status label', 'Email & status', 'Best time to call', 'Reason to call + source link + date', 'Opener', 'Talking points', 'Discovery question', 'Likely objection & response', 'Voicemail script', 'Follow-up email line', 'Research confidence & notes'];
+const columns = ['Name, title & company', 'Phone, phone type & verified date', 'Best time to call', 'Why they were selected (ICP fit)', 'Reason to call now + source + date', 'Opener, word for word', 'Discovery questions', 'Objection handling', 'The ask / next step', 'Voicemail script', 'DNC status label', 'Research confidence & notes'];
 
 export default function CallList() {
   return (
     <>
-      <SEO title="Call Lists: pricing & details" description="Call Sprint 50 ($399): 50 researched, call-ready B2B contacts with a reason to call and a script for each, delivered in 3 business days. Pilot 15 for $99." url="/call-list" />
-      <PageHeader eyebrow="Summerlyn Call Lists" title={<>Know exactly who to call this week <span className="serif-accent">and what to say.</span></>}>
-        We research your best-fit prospects, find a real reason to call each one now, and write the opener. You get a call-ready list in 3 business days. No software to learn, no annual contract.
+      <SEO title="Daily call plans: pricing & details" description="Daily calls subscription: 2, 5, 10, or 20 researched B2B prospects every weekday, delivered as calendar invites with a reason to call and a call playbook. From $199/month." url="/call-list" />
+      <PageHeader eyebrow="Summerlyn Call Lists" title={<>Know exactly who to call today <span className="serif-accent">and what to say.</span></>}>
+        Every weekday we research your best-fit prospects, find a real reason to call each one now, and write the playbook. It all arrives in one email as calendar invites. No software to learn, cancel anytime.
         <div className="mt-8 flex flex-col sm:flex-row gap-3">
-          <a href={STRIPE_LINKS.sprint} className="btn-primary">Get my 50 calls →</a>
-          <a href={STRIPE_LINKS.pilot} className="btn-ghost">Try 15 for $99</a>
+          <Link to={SIGNUP_PATH} className="btn-primary">Sign up →</Link>
+          <a href="#pricing" className="btn-ghost">Compare plans</a>
         </div>
       </PageHeader>
 
@@ -23,12 +24,12 @@ export default function CallList() {
 
       <section className="container-x section grid gap-12 lg:grid-cols-2">
         <div>
-          <SectionHead eyebrow="The deliverable" title="What lands in your inbox" body="A Google Sheet (and CSV), a 1–2 page script sheet with your master talk track and top three objections, and a delivery note with method, DNC scrub date, and replacement instructions." />
+          <SectionHead eyebrow="The deliverable" title="What lands in your inbox" body="One email each weekday morning with that day’s calendar invites attached. Accept them and your call blocks are booked, each with the research and playbook inside." />
           <Photo photo={photoCredits.repOnPhone} className="mb-8 aspect-[16/9]" />
           <div className="space-y-4">{howItWorks.map((s) => <div key={s.n} className="flex gap-4"><span className="font-serif text-2xl text-brand-300">{s.n}</span><div><p className="text-white font-medium">{s.title}</p><p className="text-sm text-zinc-400">{s.body}</p></div></div>)}</div>
         </div>
         <div className="card">
-          <p className="eyebrow mb-5">Every row includes</p>
+          <p className="eyebrow mb-5">Every invite includes</p>
           <ul className="grid gap-3 sm:grid-cols-2 text-sm">{columns.map((c) => <li key={c} className="flex gap-2"><span className="text-cyan-300">→</span>{c}</li>)}</ul>
         </div>
       </section>
@@ -38,7 +39,7 @@ export default function CallList() {
       </section>
 
       <section id="pricing" className="container-x section scroll-mt-20">
-        <SectionHead center eyebrow="Pricing" title={<>Simple pricing. <span className="serif-accent">Daily calls or one-time lists.</span></>} />
+        <SectionHead center eyebrow="Pricing" title={<>Daily calls. <span className="serif-accent">Pick your volume.</span></>} />
         <Pricing />
       </section>
 

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import SEO from '../components/SEO';
 import { CTA, FAQ, Pricing, SampleRow } from '../components/ui';
 import { photoCredits } from '../data/photoCredits';
-import { deliverables, howItWorks, icpPoints, STRIPE_LINKS } from '../data/callListOffer';
+import { deliverables, howItWorks, icpPoints, SIGNUP_PATH } from '../data/callListOffer';
 import { insights } from '../data/insights';
 
 function SectionLabel({ n, children }: { n: string; children: ReactNode }) {
@@ -28,7 +28,7 @@ export default function Home() {
   const hero = photoCredits.focusedResearch;
   return (
     <>
-      <SEO title="Know who to call and what to say" description="Don't lose time with CRMs. Summerlyn Call Lists delivers researched B2B prospects with a dated reason to call and a script for each, in 3 business days." url="/" />
+      <SEO title="Know who to call and what to say" description="Don't lose time with CRMs. Summerlyn Call Lists puts researched B2B prospects on your calendar every weekday, with why they were picked, a reason to call now, and a call playbook. From $199/month." url="/" />
 
       {/* Hero: type set directly on the photo's dark negative space */}
       <section className="relative overflow-hidden bg-black">
@@ -38,7 +38,7 @@ export default function Home() {
         <div className="relative container-x flex md:min-h-[min(calc(100svh-4rem),820px)] flex-col justify-between pt-16 pb-12 md:pt-20 md:pb-14">
           <div className="min-h-[520px] md:min-h-0 max-w-[13rem] sm:max-w-md md:max-w-xl animate-fadeUp">
             <div className="flex items-center gap-3 kicker !text-zinc-300">
-              <span className="h-px w-8 bg-zinc-400" /> Issue 01 · Call Lists
+              <span className="h-px w-8 bg-zinc-400" /> Issue 01 · Daily Calls
             </div>
             <h1 className="h-ed mt-6 text-[2.4rem] sm:text-6xl md:text-7xl lg:text-[5rem] [text-shadow:0_2px_24px_rgba(0,0,0,.45)]">
               Know who to call <br className="hidden md:inline" /><span className="italic text-brand-300">&amp; </span>what to say.
@@ -46,12 +46,12 @@ export default function Home() {
             <p className="mt-6 font-display italic text-lg md:text-2xl text-zinc-300 [text-shadow:0_1px_12px_rgba(0,0,0,.6)]">Don’t lose time with CRMs.</p>
           </div>
           <div className="sm:max-w-md animate-fadeUp">
-            <p className="text-sm md:text-base text-zinc-300 leading-relaxed [text-shadow:0_1px_10px_rgba(0,0,0,.7)]">We research your best-fit prospects, find a real, dated reason to call each one now, and write the opener for you. You just dial.</p>
+            <p className="text-sm md:text-base text-zinc-300 leading-relaxed [text-shadow:0_1px_10px_rgba(0,0,0,.7)]">Every weekday morning, one email with your calls as calendar invites: the right person, their number, why they were picked, why now, and a playbook for the call. You just dial.</p>
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
-              <a href={STRIPE_LINKS.sprint} className="btn-primary !shadow-none">Get my 50 calls · $399</a>
-              <a href="#sample" className="btn-ghost !border-white/40 backdrop-blur-sm">See an example row</a>
+              <Link to={SIGNUP_PATH} className="btn-primary !shadow-none">Sign up · from $199/mo</Link>
+              <a href="#sample" className="btn-ghost !border-white/40 backdrop-blur-sm">See an example call</a>
             </div>
-            <p className="mt-4 text-xs text-zinc-400">Call-ready in 3 business days. No software, no seats. Or <a href={STRIPE_LINKS.pilot} className="underline hover:text-white">try 15 for $99</a>.</p>
+            <p className="mt-4 text-xs text-zinc-400">Weekdays, excluding holidays. No software, no seats. Billed monthly, cancel anytime.</p>
           </div>
         </div>
       </section>
@@ -88,8 +88,8 @@ export default function Home() {
       <section id="sample" className="container-x section scroll-mt-20">
         <SectionLabel n="02">What you get</SectionLabel>
         <div className="grid gap-8 md:grid-cols-12 mb-12">
-          <h2 className="h-ed text-4xl md:text-6xl md:col-span-7">Every row answers <em className="text-brand-300">who, why now,</em> and what to say.</h2>
-          <p className="md:col-span-4 md:col-start-9 self-end text-zinc-400 leading-relaxed">A Google Sheet and CSV, one row per contact, plus a script sheet with your master talk track and top objections.</p>
+          <h2 className="h-ed text-4xl md:text-6xl md:col-span-7">Every invite answers <em className="text-brand-300">who, why now,</em> and what to say.</h2>
+          <p className="md:col-span-4 md:col-start-9 self-end text-zinc-400 leading-relaxed">Each contact arrives as a calendar invite with the full research and a call playbook, all in one weekday email.</p>
         </div>
         <SampleRow />
         <div className="mt-16 grid sm:grid-cols-2 lg:grid-cols-3 gap-x-10">
@@ -135,8 +135,8 @@ export default function Home() {
       <section id="pricing" className="container-x section scroll-mt-20">
         <SectionLabel n="04">Pricing</SectionLabel>
         <div className="grid gap-8 md:grid-cols-12 mb-14">
-          <h2 className="h-ed text-4xl md:text-6xl md:col-span-6">Pay per list. <em className="text-brand-300">Not per seat.</em></h2>
-          <p className="md:col-span-5 md:col-start-8 self-end text-zinc-400 leading-relaxed">Plain contact data is cheap. Knowing why to call and what to say is the hard part. That’s what you’re buying.</p>
+          <h2 className="h-ed text-4xl md:text-6xl md:col-span-6">Pick your daily volume. <em className="text-brand-300">Not per seat.</em></h2>
+          <p className="md:col-span-5 md:col-start-8 self-end text-zinc-400 leading-relaxed">Two to twenty researched calls every weekday, delivered to your calendar. Billed monthly, cancel anytime.</p>
         </div>
         <Pricing />
       </section>

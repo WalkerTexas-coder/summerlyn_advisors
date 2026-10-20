@@ -8,6 +8,9 @@ import InsightArticle from './pages/InsightArticle';
 import Advisory from './pages/Advisory';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Signup from './pages/Signup';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 import NotFound from './pages/NotFound';
 
 export const router = createBrowserRouter([
@@ -27,6 +30,9 @@ export const router = createBrowserRouter([
       { path: 'resources/*', element: <Navigate to="/insights" replace /> },
       { path: 'about', element: <About /> },
       { path: 'contact', element: <Contact /> },
+      { path: 'signup', element: <Signup /> },
+      { path: 'terms', element: <Terms /> },
+      { path: 'privacy', element: <Privacy /> },
       { path: '*', element: <NotFound /> },
     ],
   },
