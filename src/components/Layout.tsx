@@ -4,6 +4,7 @@ import { CONTACT_EMAIL, SIGNUP_PATH } from '../data/callListOffer';
 import CookieConsent from './CookieConsent';
 import { openCookieSettings } from '../lib/consent';
 import IntroOfferPopup from './IntroOfferPopup';
+import ArtShopShell from './ArtShopShell';
 
 const nav = [
   { to: '/call-list', label: 'Call Lists' },
@@ -94,6 +95,8 @@ function Footer() {
 }
 
 export default function Layout() {
+  const { pathname } = useLocation();
+  if (pathname === '/art' || pathname.startsWith('/art/')) return <ArtShopShell />;
   return (
     <div className="min-h-screen flex flex-col relative overflow-x-hidden">
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[700px] -z-0">

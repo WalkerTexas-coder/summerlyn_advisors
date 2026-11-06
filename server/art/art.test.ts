@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
 import { describe, expect, it } from 'vitest';
 import { isStripeHostedCheckoutUrl } from '../../src/lib/stripeCheckoutUrl';
-import { artCatalog, artCommerce, EXPECTED_STRIPE_ACCOUNT_ID, type ArtCommerceConfig, type ArtWork } from './catalog';
+import { ART_PRICE_CENTS, ART_PRICE_ID, ART_PRODUCT_ID, artCatalog, artCommerce, EXPECTED_STRIPE_ACCOUNT_ID, type ArtCommerceConfig, type ArtWork } from './catalog.js';
 import { handleArtCheckout } from './checkout';
 import { readArtConfig } from './config';
 import { createArtDeps, type ArtDeps, type ArtStripe } from './deps';
@@ -23,7 +23,7 @@ const fixtureWork: ArtWork = {
   description: 'Fixture only. Not a Summerlyn Art listing.',
   medium: 'watercolor-illustration',
   format: 'physical-print',
-  image: { src: 'https://evil.example/print.jpg', alt: 'Remote stand-in' },
+  image: { src: '/art/test-print.webp', alt: 'Test print' },
   approvedForSale: true,
   reproductionTerms: null,
   sizes: [{
@@ -32,6 +32,7 @@ const fixtureWork: ArtWork = {
     widthInches: 8,
     heightInches: 10,
     stripePriceId: 'price_testprintsize',
+    stripeProductId: null,
     unitAmountCents: 4500,
     currency: 'usd',
   }],
@@ -59,6 +60,13 @@ function fakeStripe(accountId: string) {
   const keys: Array<string | undefined> = [];
   const client: ArtStripe = {
     accounts: { retrieve: () => Promise.resolve({ id: accountId }) },
+    prices: {
+      retrieve: async (id: string) => {
+        if (id === ART_PRICE_ID) return { unit_amount: ART_PRICE_CENTS, currency: 'usd', product: ART_PRODUCT_ID };
+        if (id === 'price_testprintsize') return { unit_amount: 4500, currency: 'usd', product: 'prod_test' };
+        return { unit_amount: 1, currency: 'usd', product: 'prod_other' };
+      },
+    },
     checkout: {
       sessions: {
         create: async (params, options) => {
@@ -124,13 +132,9 @@ const paidSession = {
 };
 
 describe('Summerlyn Art catalog', () => {
-  it('ships with an empty catalog and no fulfillment terms', () => {
-    expect(artCatalog).toEqual([]);
+  it('lists the approved print without opening a sale or leaking Stripe ids', () => {
     expect(artCommerce).toEqual({ fulfillmentTerms: null, shippingCountries: [], stripeShippingRateIds: [] });
     expect(readArtConfig({ ART_ALLOW_LIVE_CHARGES: 'true', ART_CHECKOUT_ENABLED: 'true' }).allowLiveCharges).toBe(false);
-  });
-
-  it('keeps the public catalog closed and free of price ids', () => {
     const catalog = toPublicCatalog({
       catalog: artCatalog,
       commerce: artCommerce,
@@ -138,18 +142,26 @@ describe('Summerlyn Art catalog', () => {
       idempotencyConfigured: false,
       origin: 'http://localhost:5173',
     });
-    expect(catalog).toEqual({ salesOpen: false, works: [] });
+    expect(catalog.salesOpen).toBe(false);
+    expect(catalog.works).toHaveLength(1);
+    expect(catalog.works[0]).toMatchObject({
+      title: 'Summerlyn Art Print',
+      artist: 'Austin Walker',
+      image: null,
+      sizes: [{ id: 'print', purchasable: false, unitAmountCents: 2500, currency: 'usd' }],
+    });
+    expect(catalog.works[0].sizes[0].widthInches).toBeUndefined();
+    const body = JSON.stringify(catalog);
+    expect(body).not.toContain(ART_PRICE_ID);
+    expect(body).not.toContain(ART_PRODUCT_ID);
     const hidden = toPublicCatalog({
-      catalog: [fixtureWork],
+      catalog: [{ ...fixtureWork, image: { src: 'https://evil.example/print.jpg', alt: 'Remote stand-in' } }],
       commerce: fixtureCommerce,
       config: readyConfig({ checkoutEnabled: false }),
       idempotencyConfigured: true,
       origin: 'http://localhost:5173',
     });
-    expect(hidden.salesOpen).toBe(false);
     expect(hidden.works[0].image).toBeNull();
-    expect(hidden.works[0].sizes[0].purchasable).toBe(false);
-    expect(hidden.works[0].sizes[0].unitAmountCents).toBeUndefined();
     expect(JSON.stringify(hidden)).not.toContain('price_');
     expect(JSON.stringify(hidden)).not.toContain('shr_');
   });
@@ -190,9 +202,41 @@ describe('checkout', () => {
     expect(priced.status).toBe(400);
     expect(await priced.json()).toEqual({ error: 'client_price_rejected' });
 
-    const closed = await handleArtCheckout(checkoutRequest({ workId: 'test-work', sizeId: 'test-size', quantity: 1 }), createArtDeps({}));
+    const closed = await handleArtCheckout(checkoutRequest({ workId: 'summerlyn-art-print', sizeId: 'print', quantity: 1 }), createArtDeps({}));
     expect(closed.status).toBe(503);
     expect(await closed.json()).toEqual({ error: 'checkout_unavailable' });
+
+    const readyButIncomplete = readyDeps({ catalog: artCatalog, commerce: artCommerce });
+    const held = await handleArtCheckout(checkoutRequest({ workId: 'summerlyn-art-print', sizeId: 'print' }), readyButIncomplete.deps);
+    expect(held.status).toBe(503);
+    expect(readyButIncomplete.stripe.created).toHaveLength(0);
+  });
+
+  it('charges the authorized live price only after the scan and fulfillment gates are open', async () => {
+    const authorized: ArtWork = {
+      ...fixtureWork,
+      id: 'summerlyn-art-print',
+      title: 'Summerlyn Art Print',
+      sizes: [{
+        id: 'print',
+        label: '',
+        widthInches: null,
+        heightInches: null,
+        stripePriceId: ART_PRICE_ID,
+        stripeProductId: ART_PRODUCT_ID,
+        unitAmountCents: ART_PRICE_CENTS,
+        currency: 'usd',
+      }],
+    };
+    const { deps, stripe } = readyDeps({
+      catalog: [authorized],
+      config: readyConfig({ secretKey: LIVE_SECRET }),
+    });
+    const response = await handleArtCheckout(checkoutRequest({ workId: 'summerlyn-art-print', sizeId: 'print', quantity: 1 }), deps);
+    expect(response.status).toBe(200);
+    expect(stripe.created[0].line_items).toEqual([{ price: ART_PRICE_ID, quantity: 1 }]);
+    expect(JSON.stringify(stripe.created[0])).not.toContain('unit_amount');
+    expect(JSON.stringify(stripe.created[0])).not.toContain('price_data');
   });
 
   it('creates a hosted session from the server price only when every gate is open', async () => {
@@ -329,7 +373,10 @@ describe('http catalog', () => {
   it('serves an empty public catalog and no checkout link', async () => {
     const response = await handleArtRequest(new Request('http://localhost:5173/api/art/catalog'));
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ salesOpen: false, works: [] });
+    const catalog = await response.json() as { salesOpen: boolean; works: { title: string }[] };
+    expect(catalog.salesOpen).toBe(false);
+    expect(catalog.works[0].title).toBe('Summerlyn Art Print');
+    expect(JSON.stringify(catalog)).not.toContain(ART_PRICE_ID);
     expect(response.headers.get('cache-control')).toBe('no-store');
   });
 
@@ -346,6 +393,9 @@ describe('http catalog', () => {
       end(body?: string | Uint8Array) { sent.body = Buffer.from(body ?? '').toString('utf8'); },
     });
     expect(sent.statusCode).toBe(200);
-    expect(JSON.parse(sent.body ?? '')).toEqual({ salesOpen: false, works: [] });
+    const catalog = JSON.parse(sent.body ?? '');
+    expect(catalog.salesOpen).toBe(false);
+    expect(catalog.works[0].sizes[0].unitAmountCents).toBe(2500);
+    expect(sent.body ?? '').not.toContain(ART_PRICE_ID);
   });
 });

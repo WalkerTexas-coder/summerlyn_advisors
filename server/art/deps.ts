@@ -5,6 +5,9 @@ import type { IdempotencyStore } from './idempotency.js';
 
 export interface ArtStripe {
   accounts: { retrieve(id: string | null): Promise<{ id: string }> };
+  prices: {
+    retrieve(id: string): Promise<{ unit_amount: number | null; currency: string; product: string | { id: string } }>;
+  };
   checkout: {
     sessions: {
       create(
@@ -35,6 +38,7 @@ export function createArtDeps(env: NodeJS.ProcessEnv = process.env): ArtDeps {
       const stripe = new Stripe(secretKey, { apiVersion: '2026-09-30.endive' });
       return {
         accounts: { retrieve: (id) => stripe.accounts.retrieve(id) },
+        prices: { retrieve: (id) => stripe.prices.retrieve(id) },
         checkout: { sessions: { create: (params, options) => stripe.checkout.sessions.create(params, options) } },
       };
     },

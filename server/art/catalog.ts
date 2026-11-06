@@ -1,53 +1,45 @@
 /**
- * Summerlyn Art catalog — the only place listings are added.
+ * Summerlyn Art catalog. Shoppers never see this file.
  *
- * Selling Art Bot confirmed there is no approved catalog: no artwork, scans,
- * sizes, prices, licenses, fulfillment terms, or Stripe art products. Austin
- * Walker paints watercolor illustrations and intends to sell physical prints.
- * That is context for this storefront, not a listing. Leave `artCatalog` empty
- * until a real work is approved. Do not add sample pieces, stock images, or
- * guessed prices.
+ * Stripe resources already exist on Summerlyn Advisors LLC account
+ * `acct_1USelCFsaAkpNRZX`. Do not create another product, price, or payment link.
  *
- * This collection is physical prints on the existing Summerlyn Advisors LLC
- * Stripe account `acct_1USelCFsaAkpNRZX`. It is not a new merchant, a
- * marketplace, or a digital download shop. Do not put print files in `public/`
- * or on the Checkout success URL.
+ * - Product `prod_Va23AyM3PiSkaL`, name "Summerlyn Art Print"
+ * - One-time price `price_1UYrzlFsaAkpNRZX1QomJg6F`, USD 2500 cents
+ * - Product metadata `catalog_status=pending`
+ * - No payment link. No charges have been made.
  *
- * Before any size can be purchased, all of the following have to be true:
+ * Checkout always uses that Price id. The browser cannot send an amount.
+ * A live key is accepted only for this price, and only after the gates below
+ * are all true. Until then the sale stays unavailable.
  *
- * 1. The work is in `artCatalog` with the approved title, artist, description,
- *    and a photograph of that work (a site path such as `/art/works/piece.jpg`).
- *    `approvedForSale` stays false until Austin approves that exact entry.
- * 2. Each physical size has dimensions, a Stripe Price id created in the
- *    account above, and `unitAmountCents` that matches that Price. The browser
- *    sends only `workId`, `sizeId`, and quantity. It cannot send an amount.
- * 3. `artCommerce.shippingCountries`, `stripeShippingRateIds`, and
- *    `fulfillmentTerms` are the approved destinations, Stripe Shipping Rates,
- *    and the words customers will see. Empty means checkout stays closed.
- *    Do not invent a shipping policy here.
- * 4. If a sale grants any right beyond the physical print, put the approved
- *    text in `reproductionTerms`. Null states no extra right.
- * 5. Server environment (Vercel sensitive variables, never this repo):
- *    `STRIPE_SECRET_KEY` (restricted key, `rk_…`), `STRIPE_WEBHOOK_SECRET`
- *    (`whsec_…`), and `ART_CHECKOUT_ENABLED=true`. Set `ART_SITE_ORIGIN` only
- *    when Checkout should return to a host other than production or localhost.
- * 6. A Stripe webhook on `/api/art/webhook` for `checkout.session.completed`,
+ * Still required before checkout can open:
+ * 1. The authentic scan from Austin, stored outside any public download path,
+ *    referenced by `image` (a site path of that scan, with alt text).
+ * 2. `approvedForSale: true` on this work, set in the same change as the scan.
+ * 3. Approved shipping countries, Stripe shipping rate ids, and fulfillment
+ *    terms in `artCommerce`. None of those are known. Do not invent dimensions,
+ *    postage, destinations, or a timeline.
+ * 4. Server environment, never committed: restricted `STRIPE_SECRET_KEY`,
+ *    `STRIPE_WEBHOOK_SECRET`, and `ART_CHECKOUT_ENABLED=true`.
+ * 5. Webhook `/api/art/webhook` for `checkout.session.completed`,
  *    `checkout.session.async_payment_succeeded`, and
- *    `checkout.session.async_payment_failed`. Fulfillment runs in that handler
- *    after signature verification, and only when `payment_status` is `paid`.
- * 7. A durable idempotency store wired in `createArtDeps`. The memory store
- *    in tests does not survive a serverless instance and must not be used to
- *    open sales. Without it, a paid event cannot be recorded once.
- * 8. Live keys are refused while `ALLOW_LIVE_CHARGES` is false in
- *    `server/art/config.ts`. Turning that on is a separate reviewed launch.
- *    This code does not create Stripe products, prices, or payment links.
+ *    `checkout.session.async_payment_failed`. Fulfill only when the signature
+ *    verifies and `payment_status` is `paid`.
+ * 6. A durable idempotency store in `createArtDeps`. The memory store is for
+ *    tests and must not open the sale.
  *
- * Checkout also stays closed when the secret key, webhook secret, shipping
- * setup, or Price id is missing. The public page reads `GET /api/art/catalog`,
- * which strips Price ids and shipping rate ids.
+ * `reproductionTerms` stays null until Austin supplies them. Dimensions stay
+ * null until a size is approved.
  */
 
 export const EXPECTED_STRIPE_ACCOUNT_ID = 'acct_1USelCFsaAkpNRZX';
+
+export const ART_PRODUCT_ID = 'prod_Va23AyM3PiSkaL';
+
+export const ART_PRICE_ID = 'price_1UYrzlFsaAkpNRZX1QomJg6F';
+
+export const ART_PRICE_CENTS = 2500;
 
 export const MAX_PRINT_QUANTITY = 10;
 
@@ -63,13 +55,23 @@ export interface ArtImage {
 export interface ArtPrintSize {
   id: string;
   label: string;
-  widthInches: number;
-  heightInches: number;
+  /** Null until a size is approved. Do not invent one. */
+  widthInches: number | null;
+  heightInches: number | null;
   /** Price on the Summerlyn account. Server-only. */
   stripePriceId: string;
+  /** Product that owns the Price. Server-only. */
+  stripeProductId: string | null;
   /** Smallest currency unit. Must match the Stripe Price. Server-only. */
   unitAmountCents: number;
   currency: 'usd';
+}
+
+export function isAuthorizedArtPrice(size: Pick<ArtPrintSize, 'stripePriceId' | 'stripeProductId' | 'unitAmountCents' | 'currency'>): boolean {
+  return size.stripePriceId === ART_PRICE_ID
+    && size.stripeProductId === ART_PRODUCT_ID
+    && size.unitAmountCents === ART_PRICE_CENTS
+    && size.currency === 'usd';
 }
 
 export interface ArtWork {
@@ -96,7 +98,29 @@ export interface ArtCommerceConfig {
   stripeShippingRateIds: string[];
 }
 
-export const artCatalog: ArtWork[] = [];
+export const artCatalog: ArtWork[] = [
+  {
+    id: 'summerlyn-art-print',
+    title: 'Summerlyn Art Print',
+    artist: 'Austin Walker',
+    description: '',
+    medium: 'watercolor-illustration',
+    format: 'physical-print',
+    image: null,
+    sizes: [{
+      id: 'print',
+      label: '',
+      widthInches: null,
+      heightInches: null,
+      stripePriceId: ART_PRICE_ID,
+      stripeProductId: ART_PRODUCT_ID,
+      unitAmountCents: ART_PRICE_CENTS,
+      currency: 'usd',
+    }],
+    approvedForSale: false,
+    reproductionTerms: null,
+  },
+];
 
 export const artCommerce: ArtCommerceConfig = {
   fulfillmentTerms: null,

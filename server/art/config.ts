@@ -1,8 +1,9 @@
 import { EXPECTED_STRIPE_ACCOUNT_ID } from './catalog.js';
 
 /**
- * Live charges stay off until a reviewed launch changes this constant.
- * An environment variable cannot turn it on.
+ * An environment variable cannot turn live charges on for arbitrary prices.
+ * Checkout allows a live key only for the authorized Summerlyn Art price
+ * after the catalog gates are met. See `isAuthorizedArtPrice`.
  */
 export const ALLOW_LIVE_CHARGES = false;
 
