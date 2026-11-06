@@ -23,7 +23,7 @@ export default function IntroOfferPopup() {
   const [busy, setBusy] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const lastFocus = useRef<HTMLElement | null>(null);
-  const excluded = EXCLUDED.some((p) => pathname.startsWith(p));
+  const excluded = EXCLUDED.some((p) => pathname.startsWith(p)) || pathname === '/art' || pathname.startsWith('/art/');
 
   useEffect(() => {
     if (excluded || open || seen()) return;

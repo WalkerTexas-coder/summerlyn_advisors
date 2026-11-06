@@ -1,11 +1,11 @@
 import { Helmet } from 'react-helmet-async';
 
-interface SEOProps { title: string; description: string; url?: string; type?: 'website' | 'article' }
+interface SEOProps { title: string; description: string; url?: string; type?: 'website' | 'article'; brand?: string }
 
-export default function SEO({ title, description, url = '', type = 'website' }: SEOProps) {
+export default function SEO({ title, description, url = '', type = 'website', brand = 'Summerlyn Call Lists' }: SEOProps) {
   const siteUrl = import.meta.env.VITE_SITE_URL || 'https://www.summerlynadvisors.com';
   const full = `${siteUrl}${url}`;
-  const t = `${title} | Summerlyn Call Lists`;
+  const t = `${title} | ${brand}`;
   return (
     <Helmet>
       <title>{t}</title>
