@@ -105,19 +105,31 @@ export function checkoutSessionParams(input: {
       art_size_id: size.id,
       art_format: 'physical-print',
     },
-    shipping_address_collection: {
-      allowed_countries: input.commerce.shippingCountries as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection['allowed_countries'],
-    },
-    shipping_options: input.commerce.stripeShippingRateIds.map((shippingRate) => ({ shipping_rate: shippingRate })),
     integration_identifier: integrationIdentifier(),
+    ...(input.commerce.shippingCountries.length > 0 && input.commerce.stripeShippingRateIds.length > 0
+      ? {
+          shipping_address_collection: {
+            allowed_countries: input.commerce.shippingCountries as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection['allowed_countries'],
+          },
+          shipping_options: input.commerce.stripeShippingRateIds.map((shippingRate) => ({ shipping_rate: shippingRate })),
+        }
+      : {}),
   };
+}
+
+function productIdOf(product: string | { id: string }): string {
+  return typeof product === 'string' ? product : product.id;
 }
 
 async function createHostedSession(stripe: ArtStripe, deps: ArtDeps, command: CheckoutCommand, origin: string): Promise<Response> {
   const account = await stripe.accounts.retrieve(null);
   if (account.id !== deps.config.expectedStripeAccountId) return json({ error: 'checkout_unavailable' }, 503);
   const work = deps.catalog.find((item) => item.id === command.workId);
-  if (!work) return json({ error: 'checkout_unavailable' }, 503);
+  const size = work?.sizes.find((item) => item.id === command.sizeId);
+  if (!work || !size) return json({ error: 'checkout_unavailable' }, 503);
+  const price = await stripe.prices.retrieve(size.stripePriceId);
+  if (price.unit_amount !== size.unitAmountCents || price.currency !== size.currency) return json({ error: 'checkout_unavailable' }, 503);
+  if (size.stripeProductId && productIdOf(price.product) !== size.stripeProductId) return json({ error: 'checkout_unavailable' }, 503);
   const params = checkoutSessionParams({
     work,
     sizeId: command.sizeId,

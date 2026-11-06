@@ -1,5 +1,5 @@
 import type { ArtCatalogResponse, PublicArtWork, PublicPrintSize } from '../../src/data/artCatalog.js';
-import type { ArtCommerceConfig, ArtPrintSize, ArtWork } from './catalog.js';
+import { isAuthorizedArtPrice, type ArtCommerceConfig, type ArtPrintSize, type ArtWork } from './catalog.js';
 import type { ArtRuntimeConfig } from './config.js';
 import { isLiveStripeKey } from './config.js';
 
@@ -16,6 +16,7 @@ export const ART_BLOCKERS = [
   'origin_not_allowed',
   'work_not_found',
   'work_not_approved',
+  'missing_art_asset',
   'unsupported_format',
   'size_not_found',
   'invalid_size',
@@ -44,7 +45,6 @@ export function globalSalesBlockers(input: ReadinessInput): ArtBlocker[] {
   if (!config.checkoutEnabled) blockers.push('checkout_not_enabled');
   if (!config.secretKey) blockers.push('missing_stripe_secret');
   else if (!/^(sk|rk)_(test|live)_/.test(config.secretKey)) blockers.push('invalid_stripe_secret');
-  else if (isLiveStripeKey(config.secretKey) && !config.allowLiveCharges) blockers.push('live_charges_disabled');
   if (!config.webhookSecret?.startsWith('whsec_')) blockers.push('missing_webhook_secret');
   if (!input.idempotencyConfigured) blockers.push('idempotency_unconfigured');
   if (!commerce.fulfillmentTerms?.trim()) blockers.push('fulfillment_terms_missing');
@@ -60,8 +60,12 @@ export function globalSalesBlockers(input: ReadinessInput): ArtBlocker[] {
 
 function sizeBlockers(size: ArtPrintSize): ArtBlocker[] {
   const blockers: ArtBlocker[] = [];
-  if (!size.label.trim() || !Number.isFinite(size.widthInches) || size.widthInches <= 0 || !Number.isFinite(size.heightInches) || size.heightInches <= 0) {
-    blockers.push('invalid_size');
+  const width = size.widthInches;
+  const height = size.heightInches;
+  if (width !== null || height !== null) {
+    if (width === null || height === null || !Number.isFinite(width) || width <= 0 || !Number.isFinite(height) || height <= 0) {
+      blockers.push('invalid_size');
+    }
   }
   if (!/^price_[A-Za-z0-9]+$/.test(size.stripePriceId)) blockers.push('missing_price_id');
   if (!Number.isInteger(size.unitAmountCents) || size.unitAmountCents <= 0 || size.unitAmountCents > 100_000_000) {
@@ -76,11 +80,13 @@ export function checkoutBlockers(input: ReadinessInput & { workId: string; sizeI
   const work = input.catalog.find((item) => item.id === input.workId);
   if (!work) return [...blockers, 'work_not_found'];
   if (work.format !== 'physical-print') blockers.push('unsupported_format');
-  if (!work.approvedForSale || !work.title.trim() || !work.description.trim() || !work.artist.trim()) {
-    blockers.push('work_not_approved');
-  }
+  if (!work.image || !isSafeArtImageSrc(work.image.src) || !work.image.alt.trim()) blockers.push('missing_art_asset');
+  if (!work.approvedForSale || !work.title.trim() || !work.artist.trim()) blockers.push('work_not_approved');
   const size = work.sizes.find((item) => item.id === input.sizeId);
   if (!size) return [...blockers, 'size_not_found'];
+  if (input.config.secretKey && isLiveStripeKey(input.config.secretKey) && !input.config.allowLiveCharges && !isAuthorizedArtPrice(size)) {
+    blockers.push('live_charges_disabled');
+  }
   return [...blockers, ...sizeBlockers(size)];
 }
 
@@ -88,14 +94,14 @@ function publicSize(work: ArtWork, size: ArtPrintSize, input: ReadinessInput): P
   const purchasable = checkoutBlockers({ ...input, workId: work.id, sizeId: size.id }).length === 0;
   const pub: PublicPrintSize = {
     id: size.id,
-    label: size.label,
-    widthInches: size.widthInches,
-    heightInches: size.heightInches,
     purchasable,
+    unitAmountCents: size.unitAmountCents,
+    currency: size.currency,
   };
-  if (purchasable) {
-    pub.unitAmountCents = size.unitAmountCents;
-    pub.currency = size.currency;
+  if (size.label.trim()) pub.label = size.label;
+  if (size.widthInches !== null && size.heightInches !== null) {
+    pub.widthInches = size.widthInches;
+    pub.heightInches = size.heightInches;
   }
   return pub;
 }
@@ -103,7 +109,7 @@ function publicSize(work: ArtWork, size: ArtPrintSize, input: ReadinessInput): P
 export function toPublicCatalog(input: ReadinessInput): ArtCatalogResponse {
   const works: PublicArtWork[] = [];
   for (const work of input.catalog) {
-    if (!work.approvedForSale || !work.title.trim() || work.format !== 'physical-print') continue;
+    if (!work.title.trim() || work.format !== 'physical-print') continue;
     const image = work.image && isSafeArtImageSrc(work.image.src) && work.image.alt.trim()
       ? { src: work.image.src, alt: work.image.alt }
       : null;

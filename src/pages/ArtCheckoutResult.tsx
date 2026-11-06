@@ -1,33 +1,23 @@
 import { Link } from 'react-router-dom';
 import SEO from '../components/SEO';
-import { PageHeader } from '../components/ui';
 
 export default function ArtCheckoutResult({ result }: { result: 'success' | 'canceled' }) {
   const success = result === 'success';
   return (
     <>
       <SEO
-        title={success ? 'Checkout return' : 'Checkout canceled'}
-        description={success
-          ? 'Returning from Stripe does not ship a print or provide a file. Summerlyn Art records an order only after a verified paid event.'
-          : 'Summerlyn Art checkout is canceled or closed. This page does not charge a card.'}
+        title={success ? 'Thank you' : 'Purchase canceled'}
+        description={success ? 'Thank you for your purchase from Summerlyn Art.' : 'The Summerlyn Art purchase was not completed.'}
         url={success ? '/art/checkout/success' : '/art/checkout/canceled'}
         brand="Summerlyn Art"
       />
-      <PageHeader
-        eyebrow="Summerlyn Art"
-        title={success ? <>Payment is confirmed on the server, <span className="serif-accent">not on this page.</span></> : <>Checkout is closed <span className="serif-accent">from here.</span></>}
-      >
-        {success
-          ? 'If a payment was completed, Summerlyn records the print for shipment only after Stripe sends a signed event and the payment status is paid. This page does not confirm shipment and does not provide a file. Checkout for this collection is not open, so a visit here is not an order.'
-          : 'No charge is made from this page. Summerlyn Art checkout stays closed until artwork, prices, shipping, and fulfillment are approved.'}
-      </PageHeader>
-      <section className="container-x pb-24">
+      <section className="mx-auto min-h-[60vh] max-w-3xl px-6 pt-16 md:px-12 md:pt-24">
+        <h1 className="font-display text-5xl font-light text-[#1b3024] md:text-7xl">{success ? 'Thank you.' : 'The purchase was not completed.'}</h1>
         <Link
           to="/art"
-          className="btn-ghost focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-300"
+          className="mt-10 inline-flex rounded-full border border-[#1b3024]/20 px-6 py-3 text-sm font-semibold text-[#1b3024] hover:bg-[#1b3024]/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#6d5420]"
         >
-          Back to Summerlyn Art
+          Return
         </Link>
       </section>
     </>

@@ -14,9 +14,9 @@ function isSize(value: unknown): value is PublicPrintSize {
   const priceOk = size.unitAmountCents === undefined || (typeof size.unitAmountCents === 'number' && Number.isInteger(size.unitAmountCents));
   const currencyOk = size.currency === undefined || size.currency === 'usd';
   return typeof size.id === 'string'
-    && typeof size.label === 'string'
-    && typeof size.widthInches === 'number'
-    && typeof size.heightInches === 'number'
+    && (size.label === undefined || typeof size.label === 'string')
+    && (size.widthInches === undefined || typeof size.widthInches === 'number')
+    && (size.heightInches === undefined || typeof size.heightInches === 'number')
     && typeof size.purchasable === 'boolean'
     && priceOk
     && currencyOk;
