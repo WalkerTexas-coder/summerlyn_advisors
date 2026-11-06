@@ -1,10 +1,10 @@
 import Stripe from 'stripe';
-import { isStripeHostedCheckoutUrl } from '../../src/lib/stripeCheckoutUrl';
-import { CATALOG_ID, MAX_PRINT_QUANTITY, type ArtCommerceConfig, type ArtWork } from './catalog';
-import type { ArtDeps, ArtStripe } from './deps';
-import { resolveSiteOrigin } from './origin';
-import { checkoutBlockers } from './readiness';
-import { json } from './respond';
+import { isStripeHostedCheckoutUrl } from '../../src/lib/stripeCheckoutUrl.js';
+import { CATALOG_ID, MAX_PRINT_QUANTITY, type ArtCommerceConfig, type ArtWork } from './catalog.js';
+import type { ArtDeps, ArtStripe } from './deps.js';
+import { resolveSiteOrigin } from './origin.js';
+import { checkoutBlockers } from './readiness.js';
+import { json } from './respond.js';
 
 const FORBIDDEN_KEYS = new Set([
   'price',
