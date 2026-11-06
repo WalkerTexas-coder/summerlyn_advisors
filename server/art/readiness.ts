@@ -1,7 +1,7 @@
-import type { ArtCatalogResponse, PublicArtWork, PublicPrintSize } from '../../src/data/artCatalog';
-import type { ArtCommerceConfig, ArtPrintSize, ArtWork } from './catalog';
-import type { ArtRuntimeConfig } from './config';
-import { isLiveStripeKey } from './config';
+import type { ArtCatalogResponse, PublicArtWork, PublicPrintSize } from '../../src/data/artCatalog.js';
+import type { ArtCommerceConfig, ArtPrintSize, ArtWork } from './catalog.js';
+import type { ArtRuntimeConfig } from './config.js';
+import { isLiveStripeKey } from './config.js';
 
 export const ART_BLOCKERS = [
   'checkout_not_enabled',

@@ -1,4 +1,4 @@
-import { EXPECTED_STRIPE_ACCOUNT_ID } from './catalog';
+import { EXPECTED_STRIPE_ACCOUNT_ID } from './catalog.js';
 
 /**
  * Live charges stay off until a reviewed launch changes this constant.

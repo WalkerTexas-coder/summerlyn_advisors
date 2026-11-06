@@ -1,5 +1,5 @@
-import { handleArtRequest } from './http';
-import { json } from './respond';
+import { handleArtRequest } from './http.js';
+import { json } from './respond.js';
 
 type NodeResponse = {
   statusCode: number;

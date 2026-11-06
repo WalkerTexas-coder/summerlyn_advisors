@@ -1,8 +1,8 @@
 import type Stripe from 'stripe';
-import { MAX_PRINT_QUANTITY } from './catalog';
-import type { ArtDeps } from './deps';
-import type { FulfillmentClaim, ShipmentRecord } from './idempotency';
-import { json } from './respond';
+import { MAX_PRINT_QUANTITY } from './catalog.js';
+import type { ArtDeps } from './deps.js';
+import type { FulfillmentClaim, ShipmentRecord } from './idempotency.js';
+import { json } from './respond.js';
 
 const FULFILL_TYPES = new Set(['checkout.session.completed', 'checkout.session.async_payment_succeeded']);
 

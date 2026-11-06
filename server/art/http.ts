@@ -1,9 +1,9 @@
-import { handleArtCheckout } from './checkout';
-import { createArtDeps, type ArtDeps } from './deps';
-import { resolveSiteOrigin } from './origin';
-import { toPublicCatalog } from './readiness';
-import { json } from './respond';
-import { handleArtWebhook } from './webhook';
+import { handleArtCheckout } from './checkout.js';
+import { createArtDeps, type ArtDeps } from './deps.js';
+import { resolveSiteOrigin } from './origin.js';
+import { toPublicCatalog } from './readiness.js';
+import { json } from './respond.js';
+import { handleArtWebhook } from './webhook.js';
 
 export function handleArtCatalog(request: Request, deps: ArtDeps): Response {
   if (request.method !== 'GET') return json({ error: 'method_not_allowed' }, 405, { allow: 'GET' });

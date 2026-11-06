@@ -1,16 +1,16 @@
 import Stripe from 'stripe';
 import { describe, expect, it } from 'vitest';
-import { isStripeHostedCheckoutUrl } from '../../src/lib/stripeCheckoutUrl';
-import { artCatalog, artCommerce, EXPECTED_STRIPE_ACCOUNT_ID, type ArtCommerceConfig, type ArtWork } from './catalog';
-import { handleArtCheckout } from './checkout';
-import { readArtConfig } from './config';
-import { createArtDeps, type ArtDeps, type ArtStripe } from './deps';
-import { handleArtRequest } from './http';
-import { artApiHandler } from './nodeHandler';
-import { memoryIdempotencyStore, type FulfillmentClaim } from './idempotency';
-import { resolveSiteOrigin } from './origin';
-import { globalSalesBlockers, toPublicCatalog } from './readiness';
-import { handleArtWebhook } from './webhook';
+import { isStripeHostedCheckoutUrl } from '../../src/lib/stripeCheckoutUrl.js';
+import { artCatalog, artCommerce, EXPECTED_STRIPE_ACCOUNT_ID, type ArtCommerceConfig, type ArtWork } from './catalog.js';
+import { handleArtCheckout } from './checkout.js';
+import { readArtConfig } from './config.js';
+import { createArtDeps, type ArtDeps, type ArtStripe } from './deps.js';
+import { handleArtRequest } from './http.js';
+import { artApiHandler } from './nodeHandler.js';
+import { memoryIdempotencyStore, type FulfillmentClaim } from './idempotency.js';
+import { resolveSiteOrigin } from './origin.js';
+import { globalSalesBlockers, toPublicCatalog } from './readiness.js';
+import { handleArtWebhook } from './webhook.js';
 
 const TEST_SECRET = ['rk', 'test', 'placeholder'].join('_');
 const LIVE_SECRET = ['rk', 'live', 'placeholder'].join('_');
