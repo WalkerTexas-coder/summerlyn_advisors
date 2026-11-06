@@ -11,6 +11,8 @@ import Contact from './pages/Contact';
 import Signup from './pages/Signup';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
+import Art from './pages/Art';
+import ArtCheckoutResult from './pages/ArtCheckoutResult';
 import NotFound from './pages/NotFound';
 
 export const router = createBrowserRouter([
@@ -29,6 +31,9 @@ export const router = createBrowserRouter([
       { path: 'resources', element: <Navigate to="/insights" replace /> },
       { path: 'resources/*', element: <Navigate to="/insights" replace /> },
       { path: 'about', element: <About /> },
+      { path: 'art', element: <Art /> },
+      { path: 'art/checkout/success', element: <ArtCheckoutResult result="success" /> },
+      { path: 'art/checkout/canceled', element: <ArtCheckoutResult result="canceled" /> },
       { path: 'contact', element: <Contact /> },
       { path: 'signup', element: <Signup /> },
       { path: 'terms', element: <Terms /> },

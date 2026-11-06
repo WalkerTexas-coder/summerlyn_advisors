@@ -9,6 +9,7 @@ const nav = [
   { to: '/call-list', label: 'Call Lists' },
   { to: '/insights', label: 'Insights' },
   { to: '/advisory', label: 'Advisory' },
+  { to: '/art', label: 'Art' },
   { to: '/about', label: 'About' },
   { to: '/contact', label: 'Contact' },
 ];
@@ -73,6 +74,7 @@ function Footer() {
         <div className="space-y-2">
           <p className="text-white font-medium mb-3">Company</p>
           <Link className="block text-zinc-400 hover:text-white" to="/advisory">Advisory</Link>
+          <Link className="block text-zinc-400 hover:text-white" to="/art">Art</Link>
           <Link className="block text-zinc-400 hover:text-white" to="/about">About</Link>
           <Link className="block text-zinc-400 hover:text-white" to="/contact">Contact</Link>
           <a className="block text-zinc-400 hover:text-white break-all" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
