@@ -1,7 +1,7 @@
 import Stripe from 'stripe';
-import { artCatalog, artCommerce, type ArtCommerceConfig, type ArtWork } from './catalog';
-import { readArtConfig, type ArtRuntimeConfig } from './config';
-import type { IdempotencyStore } from './idempotency';
+import { artCatalog, artCommerce, type ArtCommerceConfig, type ArtWork } from './catalog.js';
+import { readArtConfig, type ArtRuntimeConfig } from './config.js';
+import type { IdempotencyStore } from './idempotency.js';
 
 export interface ArtStripe {
   accounts: { retrieve(id: string | null): Promise<{ id: string }> };
