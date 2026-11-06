@@ -21,8 +21,9 @@ function requestUrl(request: Request): URL {
   try {
     return new URL(request.url);
   } catch {
-    const host = request.headers.get('host') ?? 'localhost';
-    return new URL(request.url, `https://${host}`);
+    const hostHeader = request.headers?.get?.('x-forwarded-host') ?? request.headers?.get?.('host') ?? 'localhost';
+    const proto = request.headers?.get?.('x-forwarded-proto') ?? 'https';
+    return new URL(request.url || '/', `${proto}://${hostHeader}`);
   }
 }
 

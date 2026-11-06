@@ -1,5 +1,4 @@
-import { handleArtRequest } from '../../server/art/http';
+import { artApiHandler } from '../../server/art/nodeHandler';
 
-export function POST(request: Request): Promise<Response> | Response {
-  return handleArtRequest(request);
-}
+export default artApiHandler;
+export const POST = artApiHandler;

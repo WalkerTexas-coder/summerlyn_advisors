@@ -6,6 +6,7 @@ import { handleArtCheckout } from './checkout';
 import { readArtConfig } from './config';
 import { createArtDeps, type ArtDeps, type ArtStripe } from './deps';
 import { handleArtRequest } from './http';
+import { artApiHandler } from './nodeHandler';
 import { memoryIdempotencyStore, type FulfillmentClaim } from './idempotency';
 import { resolveSiteOrigin } from './origin';
 import { globalSalesBlockers, toPublicCatalog } from './readiness';
@@ -330,5 +331,21 @@ describe('http catalog', () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ salesOpen: false, works: [] });
     expect(response.headers.get('cache-control')).toBe('no-store');
+  });
+
+  it('answers a Node-style Vercel request with the empty catalog', async () => {
+    const sent: { statusCode?: number; body?: string; headers: Record<string, string> } = { headers: {} };
+    await artApiHandler({
+      method: 'GET',
+      url: '/api/art/catalog',
+      headers: { host: 'www.summerlynadvisors.com', 'x-forwarded-proto': 'https' },
+    }, {
+      set statusCode(value: number) { sent.statusCode = value; },
+      get statusCode() { return sent.statusCode ?? 0; },
+      setHeader(name: string, value: string) { sent.headers[name] = value; },
+      end(body?: string | Uint8Array) { sent.body = Buffer.from(body ?? '').toString('utf8'); },
+    });
+    expect(sent.statusCode).toBe(200);
+    expect(JSON.parse(sent.body ?? '')).toEqual({ salesOpen: false, works: [] });
   });
 });
