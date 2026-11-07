@@ -11,8 +11,8 @@ export function getConsent(): Consent | null {
 export function setConsent(analytics: boolean) {
   const c: Consent = { necessary: true, analytics, decidedAt: new Date().toISOString() };
   try { localStorage.setItem(KEY, JSON.stringify(c)); } catch { /* ignore */ }
-  window.dispatchEvent(new CustomEvent(CONSENT_EVENT, { detail: c }));
   loadAnalytics();
+  window.dispatchEvent(new CustomEvent(CONSENT_EVENT, { detail: c }));
 }
 
 let loaded = false;

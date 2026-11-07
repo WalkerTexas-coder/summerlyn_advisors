@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { CONTACT_EMAIL, SIGNUP_PATH } from '../data/callListOffer';
 import CookieConsent from './CookieConsent';
-import { openCookieSettings } from '../lib/consent';
-import { trackCta, trackPageView } from '../lib/posthog';
+import { CONSENT_EVENT, getConsent, openCookieSettings } from '../lib/consent';
+import { syncPostHog, trackCta, trackPageView } from '../lib/posthog';
 import IntroOfferPopup from './IntroOfferPopup';
 import ArtShopShell from './ArtShopShell';
 
@@ -98,7 +98,13 @@ function Footer() {
 
 export default function Layout() {
   const { pathname } = useLocation();
-  useEffect(() => { trackPageView(pathname); }, [pathname]);
+  useEffect(() => {
+    syncPostHog(getConsent()?.analytics === true);
+    trackPageView(pathname);
+    const onConsent = () => trackPageView(pathname);
+    window.addEventListener(CONSENT_EVENT, onConsent);
+    return () => window.removeEventListener(CONSENT_EVENT, onConsent);
+  }, [pathname]);
   if (pathname === '/art' || pathname.startsWith('/art/')) return <ArtShopShell />;
   return (
     <div className="min-h-screen flex flex-col relative overflow-x-hidden">

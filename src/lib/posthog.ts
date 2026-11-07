@@ -1,6 +1,7 @@
-import { allowlistedPath, posthogSettings, type CtaName } from './posthogPrivacy';
+import { allowlistedPath, browserOptOutSignal, captureAllowed, posthogSettings, type CtaName } from './posthogPrivacy';
 
-let booted = false;
+let ready: Promise<void> | null = null;
+let epoch = 0;
 
 function settings() {
   return posthogSettings({
@@ -9,28 +10,55 @@ function settings() {
   });
 }
 
-/** No PostHog network call unless a project ingest token, region host, and consent are all present. */
+function readSignal(): { globalPrivacyControl?: boolean; doNotTrack?: string | null } {
+  if (typeof navigator === 'undefined') return {};
+  const nav = navigator as Navigator & { globalPrivacyControl?: boolean; doNotTrack?: string | null };
+  const win = window as Window & { doNotTrack?: string | null };
+  return { globalPrivacyControl: nav.globalPrivacyControl, doNotTrack: nav.doNotTrack ?? win.doNotTrack ?? null };
+}
+
+export function analyticsBlockedByBrowser(): boolean {
+  return browserOptOutSignal(readSignal());
+}
+
+/** Starts anonymous capture only after an explicit accept, a public ingest token, and no browser opt-out signal. */
 export function syncPostHog(analyticsConsent: boolean) {
   const configured = settings();
-  if (!configured) return;
-  if (!analyticsConsent) {
-    if (!booted) return;
-    void import('./posthogClient').then((client) => client.stopPostHog());
+  const signal = readSignal();
+  const allowed = captureAllowed({
+    analyticsConsent,
+    configured: configured !== null,
+    globalPrivacyControl: signal.globalPrivacyControl,
+    doNotTrack: signal.doNotTrack,
+  });
+  const mine = ++epoch;
+  if (!allowed || !configured) {
+    const pending = ready;
+    ready = null;
+    if (pending) void pending.then(() => import('./posthogClient')).then((client) => { if (mine === epoch) client.stopPostHog(); });
     return;
   }
-  booted = true;
-  void import('./posthogClient').then((client) => client.startPostHog(configured.token, configured.host));
+  ready = import('./posthogClient').then(async (client) => {
+    await client.startPostHog(configured.token, configured.host);
+    if (mine !== epoch) client.stopPostHog();
+  });
+}
+
+function send(event: string, properties: Record<string, unknown>) {
+  const pending = ready;
+  if (!pending) return;
+  void pending.then(() => {
+    if (pending !== ready) return;
+    return import('./posthogClient').then((client) => client.captureAllowlisted(event, properties));
+  });
 }
 
 export function trackPageView(pathname: string) {
-  const configured = settings();
   const path = allowlistedPath(pathname);
-  if (!configured || !path || !booted) return;
-  void import('./posthogClient').then((client) => client.captureAllowlisted('public_page_view', { path }));
+  if (!path) return;
+  send('public_page_view', { path });
 }
 
 export function trackCta(name: CtaName) {
-  const configured = settings();
-  if (!configured || !booted) return;
-  void import('./posthogClient').then((client) => client.captureAllowlisted('cta_click', { name }));
+  send('cta_click', { name });
 }

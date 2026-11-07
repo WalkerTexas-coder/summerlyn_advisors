@@ -22,8 +22,8 @@ export const CTA_NAMES = ['signup', 'contact', 'bundle_terms'] as const;
 export type CtaName = (typeof CTA_NAMES)[number];
 
 export type PublicEvent =
-  | { event: 'public_page_view'; properties: { path: string } }
-  | { event: 'cta_click'; properties: { name: CtaName } };
+  | { event: 'public_page_view'; properties: { path: string; $geoip_disable: true } }
+  | { event: 'cta_click'; properties: { name: CtaName; $geoip_disable: true } };
 
 const SENSITIVE_VALUE = /session_id|sessionid|phc_|phx_|bearer |hmac|authorization|sk_live_|sk_test_|rk_live_|rk_test_|@|password|secret|token|blob_|cs_(test|live)_|price_|prod_/i;
 
@@ -50,17 +50,28 @@ export function sanitizeCapture(event: string, properties: Record<string, unknow
   if (event === 'public_page_view') {
     const path = typeof properties?.path === 'string' ? allowlistedPath(properties.path) : null;
     if (!path || SENSITIVE_VALUE.test(path)) return null;
-    return { event, properties: { path } };
+    return { event, properties: { path, $geoip_disable: true } };
   }
   if (event === 'cta_click') {
     const name = properties?.name;
     if (name !== 'signup' && name !== 'contact' && name !== 'bundle_terms') return null;
-    return { event, properties: { name } };
+    return { event, properties: { name, $geoip_disable: true } };
   }
   return null;
 }
 
-export function scrubPostHogEvent(event: { event?: string; properties?: Record<string, unknown> } | null): { event: string; properties: Record<string, string> } | null {
+export function browserOptOutSignal(input: { globalPrivacyControl?: boolean; doNotTrack?: string | null }): boolean {
+  const dnt = input.doNotTrack?.toLowerCase();
+  return input.globalPrivacyControl === true || dnt === '1' || dnt === 'yes';
+}
+
+/** Consent is explicit, never inferred from geography. A browser privacy signal blocks capture. */
+export function captureAllowed(input: { analyticsConsent: boolean; configured: boolean; globalPrivacyControl?: boolean; doNotTrack?: string | null }): boolean {
+  if (!input.configured || input.analyticsConsent !== true) return false;
+  return !browserOptOutSignal(input);
+}
+
+export function scrubPostHogEvent(event: { event?: string; properties?: Record<string, unknown> } | null): PublicEvent | null {
   if (!event?.event) return null;
   const clean = sanitizeCapture(event.event, event.properties);
   if (!clean) return null;
@@ -86,6 +97,8 @@ export function postHogInitOptions(host: string) {
     mask_all_text: true,
     mask_all_element_attributes: true,
     opt_out_capturing_by_default: true,
+    opt_out_persistence_by_default: true,
+    respect_dnt: true,
     advanced_disable_flags: true,
     property_denylist: ['email', 'name', 'session_id', 'token', 'authorization', '$current_url', '$referrer', '$referring_domain'],
     logs: { captureConsoleLogs: false },

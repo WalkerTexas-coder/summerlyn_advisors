@@ -3,6 +3,7 @@ import { CTA, FAQ, PageHeader, Photo, Pricing, SampleRow, SectionHead } from '..
 import { photoCredits } from '../data/photoCredits';
 import { Link } from 'react-router-dom';
 import { deliverables, howItWorks, SIGNUP_PATH } from '../data/callListOffer';
+import { trackCta } from '../lib/posthog';
 
 const columns = ['Name, title & company', 'Phone, phone type & verified date', 'Best time to call', 'Why they were selected (ICP fit)', 'Reason to call now + source + date', 'Opener, word for word', 'Discovery questions', 'Objection handling', 'The ask / next step', 'Voicemail script', 'DNC status label', 'Research confidence & notes'];
 
@@ -13,7 +14,7 @@ export default function CallList() {
       <PageHeader eyebrow="Summerlyn Call Lists" title={<>Know exactly who to call today <span className="serif-accent">and what to say.</span></>}>
         Every weekday we research your best-fit prospects, find a real reason to call each one now, and write the playbook. It all arrives in one email as calendar invites. No software to learn, cancel anytime.
         <div className="mt-8 flex flex-col sm:flex-row gap-3">
-          <Link to={SIGNUP_PATH} className="btn-primary">Sign up →</Link>
+          <Link to={SIGNUP_PATH} className="btn-primary" onClick={() => trackCta('signup')}>Sign up →</Link>
           <a href="#pricing" className="btn-ghost">Compare plans</a>
         </div>
       </PageHeader>
