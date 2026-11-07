@@ -47,7 +47,7 @@ export default function Privacy() {
       <p>To make a request, email us at the address below. We will verify your request and respond within the time required by law (generally 45 days). Authorized agents may submit requests with proof of authorization.</p>
 
       <h2 id="cookies">7. Cookies and similar technologies</h2>
-      <p>We use <strong>strictly necessary</strong> browser storage to run the site, such as remembering your cookie choice and whether you have seen a pop-up. With your consent, we may use <strong>analytics</strong> cookies to understand site usage. <strong>Non-essential cookies and analytics do not load until you click “Accept”</strong>, and you can change your choice anytime via “Cookie settings” in the footer. Stripe may set its own cookies on its checkout pages under its privacy policy.</p>
+      <p>We use <strong>strictly necessary</strong> browser storage to run the site, such as remembering your cookie choice and whether you have seen a pop-up. With your consent, we may use <strong>analytics</strong> cookies to understand site usage. <strong>Non-essential cookies and analytics do not load until you click “Accept”</strong>, and you can change your choice anytime via “Cookie settings” in the footer. If you accept, the site can load PostHog to record anonymous views of public pages and a few button names. It does not send your name or email, session replay, heatmaps, or the contents of checkout, download, or intake pages. Stripe may set its own cookies on its checkout pages under its privacy policy.</p>
       <p><button type="button" onClick={openCookieSettings} className="btn-ghost !py-2">Open cookie settings</button></p>
 
       <h2>8. Children</h2>

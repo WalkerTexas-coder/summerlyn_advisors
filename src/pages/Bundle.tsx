@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import SEO from '../components/SEO';
 import { FAQ, PageHeader, SectionHead } from '../components/ui';
 import { bundleFaqs, bundlePriceLabel, practices, receives, serviceIncluded } from '../data/bundleOffer';
+import { trackCta } from '../lib/posthog';
 
 export default function Bundle() {
   return (
@@ -87,7 +88,7 @@ export default function Bundle() {
           <p>For this assisted package, all sales are final except where the law requires otherwise.</p>
           <p>Hands-on implementation, third-party software, API usage, monitoring, ongoing support, and future updates are not included. No earnings, productivity, legal, clinical, or security outcomes are guaranteed.</p>
           <p>Prices and vendor policies in the research are dated November 6, 2026 (Central Time), not live quotes. Recheck official sources before procurement or deployment. Some provider contract and pricing questions are deliberately marked unresolved rather than guessed.</p>
-          <p>The purchase terms also appear in the <Link to="/terms#bundle-terms" className="underline hover:text-white">Terms of Service</Link>.</p>
+          <p>The purchase terms also appear in the <Link to="/terms#bundle-terms" className="underline hover:text-white" onClick={() => trackCta('bundle_terms')}>Terms of Service</Link>.</p>
         </div>
       </section>
 

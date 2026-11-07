@@ -7,6 +7,6 @@ export default defineConfig({
   plugins: [react(), summerlynArtApiPlugin(), summerlynBundleApiPlugin()],
   test: {
     environment: 'node',
-    include: ['server/**/*.test.ts'],
+    include: ['server/**/*.test.ts', 'src/lib/**/*.test.ts'],
   },
 })
