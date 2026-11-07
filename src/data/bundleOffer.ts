@@ -9,8 +9,16 @@ export const receives = [
   'Official-source registers and a practical start-here reading path.',
 ];
 
+export const serviceIncluded = [
+  'One 45-minute discovery call with Austin, in an evening or on a weekend.',
+  'One tailored written plan that Austin reviews before it is delivered.',
+  'The five business days for that plan start when the discovery call has been held, Monday through Friday, Central Time. They do not start at payment or when a time is requested.',
+  'One revision of that plan.',
+  'The call is not recorded.',
+];
+
 export const practices = [
-  'Turn an ideal outcome into a flow map and one bounded pilot.',
+  'Turn an ideal outcome into a flow map and a bounded pilot.',
   'Separate stable knowledge from changing task state.',
   'Define permission, exact-action approval, stop conditions and handoffs.',
   'Keep identities, timing, transitions and duplicate prevention out of model guesses.',
@@ -22,19 +30,23 @@ export const practices = [
 
 export const bundleFaqs = [
   {
-    q: 'What is the license?',
-    a: 'Internal use for one business and its staff. You may make reasonable staff copies and adapt the templates for that business. Resale, sublicensing, public posting, and redistribution of the materials are not included.',
+    q: 'What do the educational files allow?',
+    a: 'The files are general educational material. They are licensed for internal use by one business and its staff, including reasonable staff copies and template adaptations. Resale, sublicensing, public posting, and redistribution are not included. Notices inside the files that say consulting is not included describe those files. They do not remove the discovery call and reviewed plan included with this purchase.',
+  },
+  {
+    q: 'What service is included?',
+    a: 'Austin leads one 45-minute evening or weekend discovery call. He reviews one tailored written plan before it is delivered. The five business days start when that call has been held, Monday through Friday, Central Time. One revision is included. The call is not recorded. Hands-on implementation is not included.',
   },
   {
     q: 'Are sales refundable?',
-    a: 'All sales are final. This is a digital download, and no refund is promised. Nothing here limits a right or remedy that applicable law does not allow to be excluded.',
+    a: 'For this assisted package, all sales are final except where the law requires otherwise.',
   },
   {
     q: 'How is sales tax handled?',
-    a: 'When checkout is open, Stripe Tax calculates applicable tax at checkout and collects a billing address. Summerlyn Advisors has an active Texas sales-tax registration. Tax is collected only where a registration is active. This page does not claim a registration in every jurisdiction.',
+    a: 'When checkout is open, Stripe Tax calculates tax at checkout. The documents and the consultation are separate lines. That split is not a promise that the consultation is tax-free in Texas or anywhere else. Summerlyn Advisors has an active Texas sales-tax registration. Tax is collected only where a registration is active.',
   },
   {
-    q: 'Is this a finished system or a compliance sign-off?',
-    a: 'No. The bundle is educational material, editable planning templates, and offline teaching references. It is not deployed software, autonomous outreach, medical advice, a HIPAA certification, or a consulting engagement. Examples are synthetic. A BAA alone does not make an implementation compliant.',
+    q: 'Does requesting a time confirm the call?',
+    a: 'No. A time request is only a request. This site does not check a calendar, show open time, or send an invitation. The call is confirmed only after Austin checks for a conflict and confirms it.',
   },
 ];

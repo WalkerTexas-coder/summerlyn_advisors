@@ -6,12 +6,15 @@ import Stripe from 'stripe';
 import { describe, expect, it } from 'vitest';
 import { handleBundleAccess, handleBundleFile } from './access.js';
 import { checkoutGateBlockers, checkoutSessionParams, handleBundleCheckout } from './checkout.js';
+import { handleBundleIntake } from './intake.js';
+import { memoryIntakeStore } from './intakeStore.js';
 import { readBundleConfig } from './config.js';
 import { createBundleDeps, type BundleDeps, type BundleStripe } from './deps.js';
 import { memoryFulfillmentStore } from './fulfillment.js';
 import { handleBundleRequest } from './http.js';
 import { bundleApiHandler } from './nodeHandler.js';
-import { BUNDLE_PRICE_ID, BUNDLE_PRODUCT_ID, BUNDLE_SHA256, BUNDLE_SKU, BUNDLE_TAX_CODE, CHECKOUT_RELEASED, OFFER_SCOPE_MATCHES_PRICE, bundleProduct } from './product.js';
+import { BUNDLE_SHA256, BUNDLE_SKU, CHECKOUT_RELEASED, CONSULTING_AMOUNT_CENTS, CONSULTING_PRICE_ID, CONSULTING_PRODUCT_ID, CONSULTING_TAX_CODE, DOCUMENTS_AMOUNT_CENTS, DOCUMENTS_PRICE_ID, DOCUMENTS_PRODUCT_ID, DOCUMENTS_TAX_CODE, FILES_ONLY_PRICE_ID, OFFER_SCOPE_MATCHES_PRICE, bundleProduct } from './product.js';
+import { TAILORED_PLAN_TEMPLATE } from './tailoredPlanTemplate.js';
 import { issueDownloadToken } from './token.js';
 import { sha256Hex, type CheckoutPrice, type CheckoutProduct, type PaidSession } from './verify.js';
 import { handleBundleWebhook } from './webhook.js';
@@ -34,6 +37,10 @@ const readyConfig = {
   blobStoreId: null,
 };
 
+function line(priceId: string, amount: number, productId: string) {
+  return { quantity: 1, price: { id: priceId, unit_amount: amount, currency: 'usd', product: productId } };
+}
+
 function paidSession(overrides: Partial<PaidSession> = {}): PaidSession {
   return {
     id: 'cs_live_paidbundle123',
@@ -45,51 +52,55 @@ function paidSession(overrides: Partial<PaidSession> = {}): PaidSession {
     livemode: true,
     metadata: { bundle_sku: BUNDLE_SKU },
     line_items: {
-      data: [{
-        quantity: 1,
-        price: {
-          id: BUNDLE_PRICE_ID,
-          unit_amount: 75_000,
-          currency: 'usd',
-          product: BUNDLE_PRODUCT_ID,
-        },
-      }],
+      data: [
+        line(DOCUMENTS_PRICE_ID, DOCUMENTS_AMOUNT_CENTS, DOCUMENTS_PRODUCT_ID),
+        line(CONSULTING_PRICE_ID, CONSULTING_AMOUNT_CENTS, CONSULTING_PRODUCT_ID),
+      ],
     },
     ...overrides,
   };
 }
 
-function livePrice(overrides: Partial<CheckoutPrice> = {}): CheckoutPrice {
+function componentPrice(id: string, amount: number, productId: string, overrides: Partial<CheckoutPrice> = {}): CheckoutPrice {
   return {
-    id: BUNDLE_PRICE_ID,
-    unit_amount: 75_000,
+    id,
+    unit_amount: amount,
     currency: 'usd',
     type: 'one_time',
     active: true,
     tax_behavior: 'exclusive',
     livemode: true,
-    product: BUNDLE_PRODUCT_ID,
+    product: productId,
     ...overrides,
   };
-}
-
-function liveProduct(overrides: Partial<CheckoutProduct> = {}): CheckoutProduct {
-  return { id: BUNDLE_PRODUCT_ID, tax_code: BUNDLE_TAX_CODE, shippable: false, ...overrides };
 }
 
 function fakeStripe(options?: {
   accountId?: string;
   session?: PaidSession;
-  price?: CheckoutPrice;
-  product?: CheckoutProduct;
+  prices?: Record<string, CheckoutPrice>;
+  products?: Record<string, CheckoutProduct>;
   checkoutUrl?: string | null;
   failRetrieve?: boolean;
 }) {
   const created: Stripe.Checkout.SessionCreateParams[] = [];
+  const defaultPrices: Record<string, CheckoutPrice> = {
+    [DOCUMENTS_PRICE_ID]: componentPrice(DOCUMENTS_PRICE_ID, DOCUMENTS_AMOUNT_CENTS, DOCUMENTS_PRODUCT_ID),
+    [CONSULTING_PRICE_ID]: componentPrice(CONSULTING_PRICE_ID, CONSULTING_AMOUNT_CENTS, CONSULTING_PRODUCT_ID),
+    [FILES_ONLY_PRICE_ID]: componentPrice(FILES_ONLY_PRICE_ID, 75_000, DOCUMENTS_PRODUCT_ID),
+  };
+  const defaultProducts: Record<string, CheckoutProduct> = {
+    [DOCUMENTS_PRODUCT_ID]: { id: DOCUMENTS_PRODUCT_ID, tax_code: DOCUMENTS_TAX_CODE, shippable: false },
+    [CONSULTING_PRODUCT_ID]: { id: CONSULTING_PRODUCT_ID, tax_code: CONSULTING_TAX_CODE, shippable: false },
+  };
   const client: BundleStripe = {
     accounts: { retrieve: async () => ({ id: options?.accountId ?? bundleProduct.accountId }) },
-    prices: { retrieve: async () => options?.price ?? livePrice() },
-    products: { retrieve: async () => options?.product ?? liveProduct() },
+    prices: {
+      retrieve: async (id: string) => options?.prices?.[id] ?? defaultPrices[id] ?? componentPrice(id, 1, 'prod_other'),
+    },
+    products: {
+      retrieve: async (id: string) => options?.products?.[id] ?? defaultProducts[id] ?? { id, tax_code: 'txcd_00000000', shippable: true },
+    },
     checkout: {
       sessions: {
         create: async (params) => {
@@ -115,6 +126,7 @@ function openDeps(overrides: Partial<BundleDeps> = {}, stripe = fakeStripe()) {
     config: readyConfig,
     fulfillment: store,
     fileStore: { read: async () => FILE_BYTES },
+    intake: null,
     stripeFactory: () => stripe.client,
     verifyWebhook: (payload, header, secret) => Stripe.webhooks.constructEvent(payload, header, secret),
     now: () => 1_700_000_000_000,
@@ -163,10 +175,13 @@ describe('bundle checkout stays closed', () => {
     expect(CHECKOUT_RELEASED).toBe(false);
     expect(OFFER_SCOPE_MATCHES_PRICE).toBe(false);
     expect(bundleProduct.sha256).toBe(BUNDLE_SHA256);
-    expect(bundleProduct.unitAmountCents).toBe(75_000);
-    expect(bundleProduct.priceId).toBe(BUNDLE_PRICE_ID);
-    expect(bundleProduct.productId).toBe(BUNDLE_PRODUCT_ID);
-    expect(bundleProduct.taxCode).toBe('txcd_10302000');
+    expect(bundleProduct.totalCents).toBe(75_000);
+    expect(bundleProduct.documents.priceId).toBe(DOCUMENTS_PRICE_ID);
+    expect(bundleProduct.documents.unitAmountCents).toBe(25_000);
+    expect(bundleProduct.consulting.priceId).toBe(CONSULTING_PRICE_ID);
+    expect(bundleProduct.consulting.unitAmountCents).toBe(50_000);
+    expect(bundleProduct.filesOnlyPriceId).not.toBe(DOCUMENTS_PRICE_ID);
+    expect(bundleProduct.filesOnlyPriceId).not.toBe(CONSULTING_PRICE_ID);
   });
 
   it('refuses to charge when storage, secrets, and the release flag are absent', async () => {
@@ -250,7 +265,11 @@ describe('bundle checkout stays closed', () => {
     expect(await response.json()).toEqual({ url: 'https://checkout.stripe.com/c/pay/cs_live_new' });
     const params = stripe.created[0];
     expect(params.mode).toBe('payment');
-    expect(params.line_items).toEqual([{ price: BUNDLE_PRICE_ID, quantity: 1 }]);
+    expect(params.line_items).toEqual([
+      { price: DOCUMENTS_PRICE_ID, quantity: 1 },
+      { price: CONSULTING_PRICE_ID, quantity: 1 },
+    ]);
+    expect(JSON.stringify(params.line_items)).not.toContain(FILES_ONLY_PRICE_ID);
     expect(params.automatic_tax).toEqual({ enabled: true });
     expect(params.billing_address_collection).toBe('required');
     expect(params.success_url).toBe('http://localhost:5173/bundle/thank-you?session_id={CHECKOUT_SESSION_ID}');
@@ -269,11 +288,15 @@ describe('bundle checkout stays closed', () => {
     expect(JSON.stringify(await response.json())).not.toContain('evil.example');
   });
 
-  it('refuses a mismatched amount, tax behavior, or account', async () => {
-    const wrongAmount = fakeStripe({ price: livePrice({ unit_amount: 2500 }) });
+  it('refuses a mismatched amount, tax code, old price, or account', async () => {
+    const wrongAmount = fakeStripe({
+      prices: { [CONSULTING_PRICE_ID]: componentPrice(CONSULTING_PRICE_ID, 1, CONSULTING_PRODUCT_ID) },
+    });
     expect((await handleBundleCheckout(checkoutRequest({}), openDeps({}, wrongAmount).deps)).status).toBe(503);
     expect(wrongAmount.created).toHaveLength(0);
-    const wrongTax = fakeStripe({ product: liveProduct({ tax_code: 'txcd_00000000' }) });
+    const wrongTax = fakeStripe({
+      products: { [CONSULTING_PRODUCT_ID]: { id: CONSULTING_PRODUCT_ID, tax_code: DOCUMENTS_TAX_CODE, shippable: false } },
+    });
     expect((await handleBundleCheckout(checkoutRequest({}), openDeps({}, wrongTax).deps)).status).toBe(503);
     const wrongAccount = fakeStripe({ accountId: 'acct_other' });
     expect((await handleBundleCheckout(checkoutRequest({}), openDeps({}, wrongAccount).deps)).status).toBe(503);
@@ -283,7 +306,10 @@ describe('bundle checkout stays closed', () => {
   it('builds session params without a client-controlled return URL', () => {
     const params = checkoutSessionParams({ origin: 'https://summerlynadvisors.com', product: bundleProduct });
     expect(params.success_url).toBe('https://summerlynadvisors.com/bundle/thank-you?session_id={CHECKOUT_SESSION_ID}');
-    expect(params.line_items).toEqual([{ price: BUNDLE_PRICE_ID, quantity: 1 }]);
+    expect(params.line_items).toEqual([
+      { price: DOCUMENTS_PRICE_ID, quantity: 1 },
+      { price: CONSULTING_PRICE_ID, quantity: 1 },
+    ]);
   });
 });
 
@@ -313,7 +339,14 @@ describe('bundle download authorization', () => {
       fakeStripe({ session: paidSession({ metadata: { bundle_sku: 'art-print' } }) }),
       fakeStripe({
         session: paidSession({
-          line_items: { data: [{ quantity: 1, price: { id: 'price_other', unit_amount: 75_000, currency: 'usd', product: 'prod_other' } }] },
+          amount_subtotal: 75_000,
+          line_items: { data: [line(FILES_ONLY_PRICE_ID, 75_000, DOCUMENTS_PRODUCT_ID)] },
+        }),
+      }),
+      fakeStripe({
+        session: paidSession({
+          amount_subtotal: 25_000,
+          line_items: { data: [line(DOCUMENTS_PRICE_ID, DOCUMENTS_AMOUNT_CENTS, DOCUMENTS_PRODUCT_ID)] },
         }),
       }),
       fakeStripe({ accountId: 'acct_other' }),
@@ -407,6 +440,62 @@ describe('bundle webhook fulfillment', () => {
   });
 });
 
+describe('assisted intake', () => {
+  const validIntake = {
+    goal: 'Shorten proposal drafting',
+    workflow: 'A person reviews every outgoing note',
+    tools: 'Existing mailbox and spreadsheet',
+    constraints: 'No new vendors this quarter',
+    preferredWindows: 'A weekend afternoon or a weekday evening',
+    timeZone: 'Central Time',
+    noSensitiveData: true,
+  };
+
+  function intakeRequest(token: string | null, body: unknown) {
+    const headers: Record<string, string> = { 'content-type': 'application/json' };
+    if (token) headers.authorization = `Bearer ${token}`;
+    return new Request('http://localhost:5173/api/bundle/intake', { method: 'POST', headers, body: JSON.stringify(body) });
+  }
+
+  it('rejects anonymous, old-price, partial, and secret submissions', async () => {
+    const { deps, store } = openDeps({ intake: memoryIntakeStore() });
+    await store.record({ eventId: 'evt_intake', sessionId: 'cs_live_paidbundle123', grant: true });
+    const token = issueDownloadToken(DOWNLOAD_SECRET, 'cs_live_paidbundle123', deps.now()).token;
+    expect((await handleBundleIntake(intakeRequest(null, validIntake), deps)).status).toBe(401);
+    expect((await handleBundleIntake(intakeRequest(token, { ...validIntake, noSensitiveData: false }), deps)).status).toBe(400);
+    expect((await handleBundleIntake(intakeRequest(token, { ...validIntake, goal: 'sk_live_secretvalue' }), deps)).status).toBe(400);
+
+    const oldPrice = fakeStripe({
+      session: paidSession({
+        line_items: { data: [line(FILES_ONLY_PRICE_ID, 75_000, DOCUMENTS_PRODUCT_ID)] },
+      }),
+    });
+    const oldDeps = openDeps({ intake: memoryIntakeStore() }, oldPrice);
+    await oldDeps.store.record({ eventId: 'evt_old', sessionId: 'cs_live_paidbundle123', grant: true });
+    expect((await handleBundleIntake(intakeRequest(token, validIntake), oldDeps.deps)).status).toBe(403);
+    const unstored = openDeps({ intake: null });
+    await unstored.store.record({ eventId: 'evt_unstored', sessionId: 'cs_live_paidbundle123', grant: true });
+    expect((await handleBundleIntake(intakeRequest(token, validIntake), unstored.deps)).status).toBe(503);
+  });
+
+  it('saves a request without confirming an appointment or sending a message', async () => {
+    const intake = memoryIntakeStore();
+    const { deps, store } = openDeps({ intake });
+    await store.record({ eventId: 'evt_intake_ok', sessionId: 'cs_live_paidbundle123', grant: true });
+    const token = issueDownloadToken(DOWNLOAD_SECRET, 'cs_live_paidbundle123', deps.now()).token;
+    const response = await handleBundleIntake(intakeRequest(token, validIntake), deps);
+    expect(response.status).toBe(200);
+    const body = await response.json() as { bookingStatus: string; appointmentConfirmed: boolean; url?: string };
+    expect(body.bookingStatus).toBe('requested');
+    expect(body.appointmentConfirmed).toBe(false);
+    expect(body.url).toBeUndefined();
+    expect(intake.records.get('cs_live_paidbundle123')?.appointmentConfirmed).toBe(false);
+    const duplicate = await handleBundleIntake(intakeRequest(token, validIntake), deps);
+    expect(duplicate.status).toBe(409);
+    expect(intake.records.size).toBe(1);
+  });
+});
+
 describe('bundle public surface', () => {
   it('reports that the offer is not purchasable and hides the price id', async () => {
     const response = await handleBundleRequest(new Request('https://summerlynadvisors.com/api/bundle/status'));
@@ -424,7 +513,9 @@ describe('bundle public surface', () => {
       end(body?: string | Uint8Array) { sent.body = Buffer.from(body ?? '').toString('utf8'); },
     });
     expect(sent.statusCode).toBe(200);
-    expect(sent.body).not.toContain(BUNDLE_PRICE_ID);
+    expect(sent.body).not.toContain(DOCUMENTS_PRICE_ID);
+    expect(sent.body).not.toContain(CONSULTING_PRICE_ID);
+    expect(sent.body).not.toContain(FILES_ONLY_PRICE_ID);
     expect(sent.body).not.toContain(BUNDLE_SHA256);
   });
 
@@ -441,16 +532,23 @@ describe('bundle public surface', () => {
     }
     expect(files[0]).toContain('disabled');
     expect(files[0]).toContain('Checkout is not open');
-    expect(files[0]).toContain('not offered here');
+    expect(files[0]).toContain('45-minute');
+    expect(files[0]).not.toContain('60-minute');
     expect(files[0]).not.toContain('book a call');
+    expect(files[0]).toContain('does not mean the consultation is tax-free');
     expect(files[0]).not.toContain('/api/bundle/checkout');
     expect(files[0]).not.toContain('For checkout publication');
     expect(combined).not.toContain('buy.stripe.com');
     expect(combined).not.toContain('instant download');
+    expect(combined).not.toContain('two per month');
+    expect(combined).not.toContain('one workflow');
     expect(files[1]).not.toContain('/api/bundle/file?');
-    expect(files[2]).toContain('All sales are final');
+    expect(files[1]).toContain('not a confirmed appointment');
+    expect(files[2]).toContain('all sales are final except where the law requires otherwise');
     expect(files[0]).toContain('November 6, 2026');
-    expect(files[3]).toContain('All sales are final');
+    expect(files[3]).toContain('all sales are final except where the law requires otherwise');
+    expect(TAILORED_PLAN_TEMPLATE).toContain('Approved by Austin');
+    expect(TAILORED_PLAN_TEMPLATE).toContain('call was held');
   });
 
   it('does not keep the paid zip anywhere in the repository', () => {

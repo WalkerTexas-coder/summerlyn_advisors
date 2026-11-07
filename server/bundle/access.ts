@@ -44,7 +44,7 @@ export function parseAccessBody(raw: string): { ok: true; sessionId: string } | 
   return { ok: true, sessionId };
 }
 
-async function loadPaidSession(deps: BundleDeps, sessionId: string): Promise<'unauthorized' | 'unavailable' | 'paid'> {
+export async function loadPaidSession(deps: BundleDeps, sessionId: string): Promise<'unauthorized' | 'unavailable' | 'paid'> {
   if (!deps.config.secretKey || !deps.fulfillment) return 'unauthorized';
   try {
     const stripe = deps.stripeFactory(deps.config.secretKey);

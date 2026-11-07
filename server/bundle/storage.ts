@@ -1,6 +1,7 @@
 import { BlobNotFoundError, get, head, put } from '@vercel/blob';
 import { blobAuth, type BundleRuntimeConfig } from './config.js';
 import type { FulfillmentStore } from './fulfillment.js';
+import type { IntakeRecord, IntakeStore } from './intakeStore.js';
 import { EVENT_ID, SESSION_ID, sha256Hex } from './verify.js';
 
 export interface BundleFileStore {
@@ -82,6 +83,37 @@ export function createBlobFulfillmentStore(config: BundleRuntimeConfig): Fulfill
     async hasSession(sessionId) {
       if (!SESSION_ID.test(sessionId)) return false;
       return exists(`private/bundle-fulfillment/sessions/${sessionId}.json`, auth);
+    },
+  };
+}
+
+export function createBlobIntakeStore(config: BundleRuntimeConfig): IntakeStore | null {
+  const auth = authOptions(config);
+  if (!auth) return null;
+  return {
+    async save(record: IntakeRecord) {
+      if (!SESSION_ID.test(record.sessionId)) throw new Error('invalid_session');
+      const pathname = `private/bundle-intake/sessions/${record.sessionId}.json`;
+      if (await exists(pathname, auth)) return { duplicate: true };
+      const body = JSON.stringify({
+        ...record,
+        bookingStatus: 'requested',
+        appointmentConfirmed: false,
+        planStatus: 'awaiting_austin_review',
+      });
+      try {
+        await put(pathname, body, {
+          access: 'private',
+          addRandomSuffix: false,
+          allowOverwrite: false,
+          contentType: 'application/json',
+          ...auth,
+        });
+      } catch {
+        if (await exists(pathname, auth)) return { duplicate: true };
+        throw new Error('intake_write_failed');
+      }
+      return { duplicate: false };
     },
   };
 }

@@ -4,6 +4,7 @@ import { checkoutGateBlockers, handleBundleCheckout } from './checkout.js';
 import { createBundleDeps, type BundleDeps } from './deps.js';
 import { json } from './respond.js';
 import { verifiedBytes } from './storage.js';
+import { handleBundleIntake } from './intake.js';
 import { handleBundleWebhook } from './webhook.js';
 
 export async function handleBundleStatus(request: Request, deps: BundleDeps): Promise<Response> {
@@ -37,6 +38,7 @@ export function handleBundleRequest(request: Request, deps: BundleDeps = createB
   if (path === '/api/bundle/checkout') return handleBundleCheckout(request, deps);
   if (path === '/api/bundle/access') return handleBundleAccess(request, deps);
   if (path === '/api/bundle/file') return handleBundleFile(request, deps);
+  if (path === '/api/bundle/intake') return handleBundleIntake(request, deps);
   if (path === '/api/bundle/webhook') return handleBundleWebhook(request, deps);
   return json({ error: 'not_found' }, 404);
 }

@@ -7,7 +7,7 @@ import type { FulfillmentStore } from './fulfillment.js';
 import { CHECKOUT_RELEASED, OFFER_SCOPE_MATCHES_PRICE, type BundleProduct } from './product.js';
 import { json } from './respond.js';
 import { verifiedBytes } from './storage.js';
-import { priceMatchesBundle, productMatchesBundle } from './verify.js';
+import { componentPriceMatches, consultingProductMatches, documentsProductMatches } from './verify.js';
 
 const FORBIDDEN_KEYS = new Set([
   'price',
@@ -88,7 +88,10 @@ export function checkoutSessionParams(input: {
   return {
     mode: 'payment',
     ui_mode: 'hosted_page',
-    line_items: [{ price: input.product.priceId, quantity: 1 }],
+    line_items: [
+      { price: input.product.documents.priceId, quantity: 1 },
+      { price: input.product.consulting.priceId, quantity: 1 },
+    ],
     automatic_tax: { enabled: true },
     billing_address_collection: 'required',
     success_url: `${input.origin}/bundle/thank-you?session_id={CHECKOUT_SESSION_ID}`,
@@ -97,6 +100,7 @@ export function checkoutSessionParams(input: {
     metadata: {
       bundle_sku: input.product.sku,
       bundle_edition: input.product.edition,
+      offer: 'documents-and-consultation',
     },
     integration_identifier: integrationIdentifier(),
   };
@@ -144,10 +148,16 @@ export async function handleBundleCheckout(request: Request, deps: BundleDeps): 
     const stripe = deps.stripeFactory(deps.config.secretKey as string);
     const account = await stripe.accounts.retrieve(null);
     if (account.id !== deps.product.accountId) return json({ error: 'checkout_unavailable' }, 503);
-    const price = await stripe.prices.retrieve(deps.product.priceId);
-    if (!priceMatchesBundle(price, deps.product)) return json({ error: 'checkout_unavailable' }, 503);
-    const remoteProduct = await stripe.products.retrieve(deps.product.productId);
-    if (!productMatchesBundle(remoteProduct, deps.product)) return json({ error: 'checkout_unavailable' }, 503);
+    const documentsPrice = await stripe.prices.retrieve(deps.product.documents.priceId);
+    const consultingPrice = await stripe.prices.retrieve(deps.product.consulting.priceId);
+    const documentsProduct = await stripe.products.retrieve(deps.product.documents.productId);
+    const consultingProduct = await stripe.products.retrieve(deps.product.consulting.productId);
+    const documentsOk = componentPriceMatches(documentsPrice, deps.product.documents, deps.product.filesOnlyPriceId)
+      && documentsProductMatches(documentsProduct, deps.product.documents);
+    const consultingOk = componentPriceMatches(consultingPrice, deps.product.consulting, deps.product.filesOnlyPriceId)
+      && consultingProductMatches(consultingProduct, deps.product.consulting);
+    const amounts = (documentsPrice.unit_amount ?? 0) + (consultingPrice.unit_amount ?? 0);
+    if (!documentsOk || !consultingOk || amounts !== deps.product.totalCents) return json({ error: 'checkout_unavailable' }, 503);
     const params = checkoutSessionParams({ origin, product: deps.product });
     const idempotencyKey = parsed.command.idempotencyKey
       ? `bundle-checkout-${parsed.command.idempotencyKey}`

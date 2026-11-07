@@ -2,7 +2,8 @@ import Stripe from 'stripe';
 import { CHECKOUT_RELEASED, OFFER_SCOPE_MATCHES_PRICE, bundleProduct, type BundleProduct } from './product.js';
 import { readBundleConfig, type BundleRuntimeConfig } from './config.js';
 import type { FulfillmentStore } from './fulfillment.js';
-import { createBlobFulfillmentStore, createPrivateFileStore, type BundleFileStore } from './storage.js';
+import type { IntakeStore } from './intakeStore.js';
+import { createBlobFulfillmentStore, createBlobIntakeStore, createPrivateFileStore, type BundleFileStore } from './storage.js';
 import type { CheckoutPrice, CheckoutProduct, PaidSession } from './verify.js';
 
 export interface BundleStripe {
@@ -24,11 +25,13 @@ export interface BundleDeps {
   product: BundleProduct;
   /** Hard closed unless this revision explicitly releases checkout. */
   checkoutReleased: boolean;
-  /** False while this files-only price is not confirmed as the sold scope. */
+  /** False until storage, webhook setup, and an end-to-end check are verified. */
   offerScopeMatchesPrice: boolean;
   config: BundleRuntimeConfig;
   /** Null until private durable storage is configured. Checkout stays closed. */
   fulfillment: FulfillmentStore | null;
+  /** Null until the same private store can keep intake. No email or calendar send. */
+  intake: IntakeStore | null;
   fileStore: BundleFileStore;
   stripeFactory: (secretKey: string) => BundleStripe;
   verifyWebhook: (payload: string, header: string, secret: string) => Stripe.Event;
@@ -43,6 +46,7 @@ export function createBundleDeps(env: NodeJS.ProcessEnv = process.env): BundleDe
     offerScopeMatchesPrice: OFFER_SCOPE_MATCHES_PRICE,
     config,
     fulfillment: createBlobFulfillmentStore(config),
+    intake: createBlobIntakeStore(config),
     fileStore: createPrivateFileStore(config, bundleProduct.sha256),
     stripeFactory: (secretKey) => {
       const stripe = new Stripe(secretKey, { apiVersion: '2026-09-30.endive' });

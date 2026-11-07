@@ -1,37 +1,48 @@
 /**
- * Server-controlled identity of the Practical AI Implementation Bundle.
- * The browser cannot choose the price, product, amount, currency, or tax code.
- * Do not create another Stripe product, price, or payment link for this offer.
+ * Server-controlled identity of the assisted package.
+ * The browser cannot choose prices, products, amounts, currency, or tax codes.
+ * Do not create another product, price, or payment link from this app.
  *
- * Live account acct_1USelCFsaAkpNRZX (Summerlyn Advisors LLC):
- * - Product prod_Va8BcFbHmL8qoU, tax code txcd_10302000, not shippable
- * - Price price_1UYxurFsaAkpNRZXO4el745q, one-time USD 75000, tax exclusive
+ * Approved allocation, before tax, tax exclusive:
+ * - Documents $250: price_1UYyJJFsaAkpNRZXJi8hGEnm on prod_Va8BcFbHmL8qoU, txcd_10302000
+ * - Consultation $500: price_1UYyJNFsaAkpNRZX9vY0CDYY on prod_Va8a8DqISyO6Le, txcd_20060048
+ * - Total subtotal USD 75000. Quantity 1 of each line.
  *
- * Checkout stays closed. This price is a files-only digital-books price.
- * It must not be charged for a consultation, discovery call, or custom plan.
- * Those were proposed and are not confirmed: duration, capacity, turnaround,
- * revisions, refunds, and assisted-service tax classification are undecided.
- * Do not retarget this product or tax code at that mixed offer.
+ * The older files-only price price_1UYxurFsaAkpNRZXO4el745q stays on the
+ * account and must not be charged for this package. A payment for that price,
+ * or for only one of the two lines, does not grant the assisted package.
  *
- * Opening checkout requires a reviewed change to both flags below, after the
- * sold scope is confirmed to match this files-only price, a private copy of
- * the zip is stored, and a paid-session download of that exact file is verified.
+ * Line-item tax codes are not a finding that the consultation is tax-free in
+ * Texas. Checkout stays closed until private storage, the webhook secret, and
+ * an end-to-end paid delivery have been verified.
  */
 
 export const CHECKOUT_RELEASED = false;
 
-/** False until the confirmed offer is this files-only library, not an assisted service. */
+/** False until storage, webhook setup, and an end-to-end check are verified. */
 export const OFFER_SCOPE_MATCHES_PRICE = false;
 
 export const BUNDLE_ACCOUNT_ID = 'acct_1USelCFsaAkpNRZX';
 
-export const BUNDLE_PRODUCT_ID = 'prod_Va8BcFbHmL8qoU';
+export const FILES_ONLY_PRICE_ID = 'price_1UYxurFsaAkpNRZXO4el745q';
 
-export const BUNDLE_PRICE_ID = 'price_1UYxurFsaAkpNRZXO4el745q';
+export const DOCUMENTS_PRICE_ID = 'price_1UYyJJFsaAkpNRZXJi8hGEnm';
 
-export const BUNDLE_UNIT_AMOUNT_CENTS = 75_000;
+export const DOCUMENTS_PRODUCT_ID = 'prod_Va8BcFbHmL8qoU';
 
-export const BUNDLE_TAX_CODE = 'txcd_10302000';
+export const DOCUMENTS_AMOUNT_CENTS = 25_000;
+
+export const DOCUMENTS_TAX_CODE = 'txcd_10302000';
+
+export const CONSULTING_PRICE_ID = 'price_1UYyJNFsaAkpNRZX9vY0CDYY';
+
+export const CONSULTING_PRODUCT_ID = 'prod_Va8a8DqISyO6Le';
+
+export const CONSULTING_AMOUNT_CENTS = 50_000;
+
+export const CONSULTING_TAX_CODE = 'txcd_20060048';
+
+export const BUNDLE_TOTAL_CENTS = 75_000;
 
 export const BUNDLE_SKU = 'ai-implementation-bundle';
 
@@ -44,14 +55,21 @@ export const BUNDLE_SHA256 = '84bc80785adad21de677234562419af1629201f3ece196f887
 
 export const DOWNLOAD_TOKEN_TTL_MS = 10 * 60 * 1000;
 
+export interface PricedComponent {
+  priceId: string;
+  productId: string;
+  unitAmountCents: number;
+  taxCode: string;
+}
+
 export interface BundleProduct {
   accountId: string;
-  productId: string;
-  priceId: string;
-  unitAmountCents: number;
+  filesOnlyPriceId: string;
+  totalCents: number;
   currency: 'usd';
-  taxCode: string;
   taxBehavior: 'exclusive';
+  documents: PricedComponent;
+  consulting: PricedComponent;
   sku: string;
   edition: string;
   filename: string;
@@ -60,12 +78,22 @@ export interface BundleProduct {
 
 export const bundleProduct: BundleProduct = {
   accountId: BUNDLE_ACCOUNT_ID,
-  productId: BUNDLE_PRODUCT_ID,
-  priceId: BUNDLE_PRICE_ID,
-  unitAmountCents: BUNDLE_UNIT_AMOUNT_CENTS,
+  filesOnlyPriceId: FILES_ONLY_PRICE_ID,
+  totalCents: BUNDLE_TOTAL_CENTS,
   currency: 'usd',
-  taxCode: BUNDLE_TAX_CODE,
   taxBehavior: 'exclusive',
+  documents: {
+    priceId: DOCUMENTS_PRICE_ID,
+    productId: DOCUMENTS_PRODUCT_ID,
+    unitAmountCents: DOCUMENTS_AMOUNT_CENTS,
+    taxCode: DOCUMENTS_TAX_CODE,
+  },
+  consulting: {
+    priceId: CONSULTING_PRICE_ID,
+    productId: CONSULTING_PRODUCT_ID,
+    unitAmountCents: CONSULTING_AMOUNT_CENTS,
+    taxCode: CONSULTING_TAX_CODE,
+  },
   sku: BUNDLE_SKU,
   edition: BUNDLE_EDITION,
   filename: BUNDLE_FILENAME,
