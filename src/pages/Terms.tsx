@@ -3,8 +3,8 @@ import { LegalPage } from './Legal';
 
 export default function Terms() {
   return (
-    <LegalPage title="Terms of Service" url="/terms" description="Terms of Service for Summerlyn Call Lists daily call subscriptions, provided by Summerlyn Advisors LLC.">
-      <p>These Terms of Service (“Terms”) govern your use of the Summerlyn Call Lists service and summerlynadvisors.com (together, the “Service”), provided by <strong>Summerlyn Advisors LLC</strong>, a Texas limited liability company based in Leander, Texas (“Summerlyn,” “we,” “us”). By checking out, subscribing, or using the Service, you agree to these Terms on behalf of yourself and the business you represent (“you,” “Customer”). If you do not agree, do not use the Service.</p>
+    <LegalPage title="Terms of Service" url="/terms" description="Terms of Service for Summerlyn Call Lists and the Practical AI Implementation Bundle, provided by Summerlyn Advisors LLC.">
+      <p>These Terms of Service (“Terms”) govern your use of the Summerlyn Call Lists service and summerlynadvisors.com (together, the “Service”), provided by <strong>Summerlyn Advisors LLC</strong>, a Texas limited liability company based in Leander, Texas (“Summerlyn,” “we,” “us”). By checking out, subscribing, or using the Service, you agree to these Terms on behalf of yourself and the business you represent (“you,” “Customer”). If you do not agree, do not use the Service. Purchases of the Practical AI Implementation Bundle are also governed by section 13.</p>
 
       <h2>1. The Service</h2>
       <p>Summerlyn provides a business-to-business research service. Each weekday (Monday through Friday, excluding US federal holidays) we email you a set number of researched business prospects according to your plan, delivered as calendar invitations that may include a name, business phone number, why the contact was selected, a reason to call now, and a suggested call playbook. The Service is for B2B use only. We do not make calls on your behalf.</p>
@@ -54,6 +54,15 @@ export default function Terms() {
 
       <h2>12. Changes and general terms</h2>
       <p>We may update these Terms by posting a revised version with a new effective date; material changes will be emailed to subscribers and apply from your next billing period. If any provision is unenforceable, the rest remains in effect. These Terms, together with our Privacy Policy, are the entire agreement between you and Summerlyn about the Service.</p>
+
+      <h2 id="bundle-terms">13. Practical AI Implementation Bundle</h2>
+      <p>This section applies to the one-time Practical AI Implementation Bundle (November 2026 edition) and controls that purchase if it conflicts with the subscription terms above. It does not change the Call Lists subscription.</p>
+      <ul>
+        <li><strong>Price.</strong> The bundle is $750 USD, charged once. Applicable taxes, if any, are calculated at checkout by Stripe Tax using the billing address collected there. Summerlyn has an active Texas sales-tax registration. Tax is collected only where a registration is active. These Terms do not claim a registration in every jurisdiction.</li>
+        <li><strong>License.</strong> The purchaser receives a nonexclusive, nontransferable license to use the PDFs, editable guides, CSV templates, and educational examples internally within one business, including reasonable staff copies and adaptations of templates for that business’s own operations. Resale, sublicensing, public posting, and external redistribution of the materials or substantial portions are not permitted. Third-party services, marks, software, and documentation remain under their own terms and are not included.</li>
+        <li><strong>All sales final.</strong> The bundle is a digital download. All sales are final, and Summerlyn does not promise a refund. Nothing in these Terms limits a right or remedy that applicable law does not allow to be excluded.</li>
+        <li><strong>What it is not.</strong> The materials are educational and supplied as-is. They are not deployed software, medical, legal, financial, privacy, or security advice, a HIPAA certification, a consulting engagement, or a promise of any particular result. Examples are synthetic. Prices and vendor policies printed in the research are dated November 6, 2026 (Central Time), not live quotes.</li>
+      </ul>
     </LegalPage>
   );
 }

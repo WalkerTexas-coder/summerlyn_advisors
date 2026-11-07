@@ -13,6 +13,8 @@ import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import Art from './pages/Art';
 import ArtCheckoutResult from './pages/ArtCheckoutResult';
+import Bundle from './pages/Bundle';
+import BundleThankYou from './pages/BundleThankYou';
 import NotFound from './pages/NotFound';
 
 export const router = createBrowserRouter([
@@ -34,6 +36,8 @@ export const router = createBrowserRouter([
       { path: 'art', element: <Art /> },
       { path: 'art/checkout/success', element: <ArtCheckoutResult result="success" /> },
       { path: 'art/checkout/canceled', element: <ArtCheckoutResult result="canceled" /> },
+      { path: 'bundle', element: <Bundle /> },
+      { path: 'bundle/thank-you', element: <BundleThankYou /> },
       { path: 'contact', element: <Contact /> },
       { path: 'signup', element: <Signup /> },
       { path: 'terms', element: <Terms /> },

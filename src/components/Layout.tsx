@@ -68,6 +68,7 @@ function Footer() {
         <div className="space-y-2">
           <p className="text-white font-medium mb-3">Product</p>
           <Link className="block text-zinc-400 hover:text-white" to="/call-list">Call Lists</Link>
+          <Link className="block text-zinc-400 hover:text-white" to="/bundle">Implementation bundle</Link>
           <Link className="block text-zinc-400 hover:text-white" to="/call-list#pricing">Pricing</Link>
           <Link className="block text-zinc-400 hover:text-white" to={SIGNUP_PATH}>Sign up</Link>
           <Link className="block text-zinc-400 hover:text-white" to="/insights">Insights</Link>
