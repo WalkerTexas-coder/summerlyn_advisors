@@ -5,6 +5,7 @@ import { CTA, FAQ, Pricing, SampleRow } from '../components/ui';
 import { photoCredits } from '../data/photoCredits';
 import { deliverables, howItWorks, icpPoints, SIGNUP_PATH } from '../data/callListOffer';
 import { insights } from '../data/insights';
+import { trackCta } from '../lib/posthog';
 
 function SectionLabel({ n, children }: { n: string; children: ReactNode }) {
   return (
@@ -48,7 +49,7 @@ export default function Home() {
           <div className="sm:max-w-md animate-fadeUp">
             <p className="text-sm md:text-base text-zinc-300 leading-relaxed [text-shadow:0_1px_10px_rgba(0,0,0,.7)]">Every weekday morning, one email with your calls as calendar invites: the right person, their number, why they were picked, why now, and a playbook for the call. You just dial.</p>
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
-              <Link to={SIGNUP_PATH} className="btn-primary !shadow-none">Sign up · from $199/mo</Link>
+              <Link to={SIGNUP_PATH} className="btn-primary !shadow-none" onClick={() => trackCta('signup')}>Sign up · from $199/mo</Link>
               <a href="#sample" className="btn-ghost !border-white/40 backdrop-blur-sm">See an example call</a>
             </div>
             <p className="mt-4 text-xs text-zinc-400">Weekdays, excluding holidays. No software, no seats. Billed monthly, cancel anytime.</p>

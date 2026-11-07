@@ -3,8 +3,8 @@ import { LegalPage } from './Legal';
 
 export default function Terms() {
   return (
-    <LegalPage title="Terms of Service" url="/terms" description="Terms of Service for Summerlyn Call Lists daily call subscriptions, provided by Summerlyn Advisors LLC.">
-      <p>These Terms of Service (“Terms”) govern your use of the Summerlyn Call Lists service and summerlynadvisors.com (together, the “Service”), provided by <strong>Summerlyn Advisors LLC</strong>, a Texas limited liability company based in Leander, Texas (“Summerlyn,” “we,” “us”). By checking out, subscribing, or using the Service, you agree to these Terms on behalf of yourself and the business you represent (“you,” “Customer”). If you do not agree, do not use the Service.</p>
+    <LegalPage title="Terms of Service" url="/terms" description="Terms of Service for Summerlyn Call Lists and the Practical AI Implementation Bundle, provided by Summerlyn Advisors LLC.">
+      <p>These Terms of Service (“Terms”) govern your use of the Summerlyn Call Lists service and summerlynadvisors.com (together, the “Service”), provided by <strong>Summerlyn Advisors LLC</strong>, a Texas limited liability company based in Leander, Texas (“Summerlyn,” “we,” “us”). By checking out, subscribing, or using the Service, you agree to these Terms on behalf of yourself and the business you represent (“you,” “Customer”). If you do not agree, do not use the Service. Purchases of the Practical AI Implementation Bundle are also governed by section 13.</p>
 
       <h2>1. The Service</h2>
       <p>Summerlyn provides a business-to-business research service. Each weekday (Monday through Friday, excluding US federal holidays) we email you a set number of researched business prospects according to your plan, delivered as calendar invitations that may include a name, business phone number, why the contact was selected, a reason to call now, and a suggested call playbook. The Service is for B2B use only. We do not make calls on your behalf.</p>
@@ -54,6 +54,16 @@ export default function Terms() {
 
       <h2>12. Changes and general terms</h2>
       <p>We may update these Terms by posting a revised version with a new effective date; material changes will be emailed to subscribers and apply from your next billing period. If any provision is unenforceable, the rest remains in effect. These Terms, together with our Privacy Policy, are the entire agreement between you and Summerlyn about the Service.</p>
+
+      <h2 id="bundle-terms">13. Implementation bundle and consultation</h2>
+      <p>This section applies to the one-time assisted package (November 2026 educational files plus Austin’s discovery call and reviewed plan) and controls that purchase if it conflicts with the subscription terms above. It does not change the Call Lists subscription. It is not a separate documents-only offer.</p>
+      <ul>
+        <li><strong>Price.</strong> The total is $750 USD before tax, charged once: $250 for the educational documents and $500 for the consultation. Applicable taxes are calculated at checkout by Stripe Tax using the billing address collected there. Separating those lines does not mean the consultation is tax-free. Summerlyn has an active Texas sales-tax registration. Tax is collected only where a registration is active. These Terms do not claim a registration in every jurisdiction.</li>
+        <li><strong>Educational files.</strong> The purchaser receives a nonexclusive, nontransferable license to use the PDFs, editable guides, CSV templates, and educational examples internally within one business, including reasonable staff copies and adaptations of templates for that business’s own operations. Resale, sublicensing, public posting, and external redistribution of the materials or substantial portions are not permitted. Notices inside the files describe the files. Where those notices say consulting is not included, they do not cancel the service in this section, and this section does not rewrite the files.</li>
+        <li><strong>Included service.</strong> Austin conducts one 45-minute discovery call in an evening or on a weekend. The call is not recorded. Austin reviews one tailored written plan before it is delivered. The five business days for that plan start when the discovery call has been held, counted Monday through Friday, Central Time, not at payment or at a time request. One revision of that plan is included. A request for a time is not a confirmed appointment. Summerlyn does not show open calendar time on the website.</li>
+        <li><strong>All sales final.</strong> For this assisted package, all sales are final except where the law requires otherwise.</li>
+        <li><strong>What it is not.</strong> The files are educational and supplied as-is. The service is not hands-on implementation, deployed software, medical, legal, financial, privacy, or security advice, a HIPAA certification, or a promise of any particular result. Examples in the files are synthetic. Prices and vendor policies printed in the research are dated November 6, 2026 (Central Time), not live quotes.</li>
+      </ul>
     </LegalPage>
   );
 }

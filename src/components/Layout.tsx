@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { CONTACT_EMAIL, SIGNUP_PATH } from '../data/callListOffer';
 import CookieConsent from './CookieConsent';
-import { openCookieSettings } from '../lib/consent';
+import { CONSENT_EVENT, getConsent, openCookieSettings } from '../lib/consent';
+import { syncPostHog, trackCta, trackPageView } from '../lib/posthog';
 import IntroOfferPopup from './IntroOfferPopup';
 import ArtShopShell from './ArtShopShell';
 
@@ -41,7 +42,7 @@ function Header() {
           {nav.map((n) => (
             <NavLink key={n.to} to={n.to} className={({ isActive }) => `transition hover:text-white ${isActive ? 'text-white' : 'text-zinc-400'}`}>{n.label}</NavLink>
           ))}
-          <Link to={SIGNUP_PATH} className="btn-primary !py-2 !px-4">Sign up</Link>
+          <Link to={SIGNUP_PATH} className="btn-primary !py-2 !px-4" onClick={() => trackCta('signup')}>Sign up</Link>
         </nav>
         <button className="md:hidden text-white p-2" aria-label="Toggle menu" aria-expanded={open} onClick={() => setOpen(!open)}>
           <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">{open ? <path d="M5 5l12 12M17 5L5 17" /> : <path d="M3 6h16M3 11h16M3 16h16" />}</svg>
@@ -50,7 +51,7 @@ function Header() {
       {open && (
         <nav className="md:hidden container-x pb-6 flex flex-col gap-4 text-lg">
           {nav.map((n) => <NavLink key={n.to} to={n.to} className="text-zinc-300">{n.label}</NavLink>)}
-          <Link to={SIGNUP_PATH} className="btn-primary mt-2">Sign up</Link>
+          <Link to={SIGNUP_PATH} className="btn-primary mt-2" onClick={() => trackCta('signup')}>Sign up</Link>
         </nav>
       )}
     </header>
@@ -68,8 +69,9 @@ function Footer() {
         <div className="space-y-2">
           <p className="text-white font-medium mb-3">Product</p>
           <Link className="block text-zinc-400 hover:text-white" to="/call-list">Call Lists</Link>
+          <Link className="block text-zinc-400 hover:text-white" to="/bundle">Implementation bundle</Link>
           <Link className="block text-zinc-400 hover:text-white" to="/call-list#pricing">Pricing</Link>
-          <Link className="block text-zinc-400 hover:text-white" to={SIGNUP_PATH}>Sign up</Link>
+          <Link className="block text-zinc-400 hover:text-white" to={SIGNUP_PATH} onClick={() => trackCta('signup')}>Sign up</Link>
           <Link className="block text-zinc-400 hover:text-white" to="/insights">Insights</Link>
         </div>
         <div className="space-y-2">
@@ -77,7 +79,7 @@ function Footer() {
           <Link className="block text-zinc-400 hover:text-white" to="/advisory">Advisory</Link>
           <Link className="block text-zinc-400 hover:text-white" to="/art">Art</Link>
           <Link className="block text-zinc-400 hover:text-white" to="/about">About</Link>
-          <Link className="block text-zinc-400 hover:text-white" to="/contact">Contact</Link>
+          <Link className="block text-zinc-400 hover:text-white" to="/contact" onClick={() => trackCta('contact')}>Contact</Link>
           <a className="block text-zinc-400 hover:text-white break-all" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
         </div>
       </div>
@@ -96,6 +98,13 @@ function Footer() {
 
 export default function Layout() {
   const { pathname } = useLocation();
+  useEffect(() => {
+    syncPostHog(getConsent()?.analytics === true);
+    trackPageView(pathname);
+    const onConsent = () => trackPageView(pathname);
+    window.addEventListener(CONSENT_EVENT, onConsent);
+    return () => window.removeEventListener(CONSENT_EVENT, onConsent);
+  }, [pathname]);
   if (pathname === '/art' || pathname.startsWith('/art/')) return <ArtShopShell />;
   return (
     <div className="min-h-screen flex flex-col relative overflow-x-hidden">

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getConsent, loadAnalytics, OPEN_EVENT, setConsent } from '../lib/consent';
+import { analyticsBlockedByBrowser } from '../lib/posthog';
 
 export default function CookieConsent() {
   const [open, setOpen] = useState(false);
@@ -26,16 +27,22 @@ export default function CookieConsent() {
   }, []);
 
   if (!open) return null;
-  const decide = (a: boolean) => { setConsent(a); setOpen(false); setCustom(false); };
+  const browserOptOut = analyticsBlockedByBrowser();
+  const decide = (analyticsChoice: boolean) => {
+    setConsent(browserOptOut ? false : analyticsChoice);
+    setOpen(false);
+    setCustom(false);
+  };
 
   return (
-    <div ref={ref} role="dialog" aria-modal="false" aria-labelledby="cookie-title" className="fixed inset-x-0 bottom-0 z-[110] p-2 sm:p-6">
+    <div ref={ref} role="dialog" aria-modal="false" aria-labelledby="cookie-title" aria-describedby="cookie-desc" className="fixed inset-x-0 bottom-0 z-[110] p-2 sm:p-6">
       <div className="mx-auto max-w-3xl rounded-2xl border border-white/10 bg-ink-900/95 p-4 sm:p-6 shadow-2xl backdrop-blur-xl">
         <p id="cookie-title" className="font-semibold text-white text-sm sm:text-base">Cookies & privacy</p>
         <p className="mt-1 text-xs text-zinc-400 sm:hidden">Necessary storage only, unless you allow analytics. <Link to="/privacy#cookies" className="underline hover:text-white">Privacy Policy</Link>.</p>
-        <p className="mt-2 text-sm text-zinc-400 hidden sm:block">
-          We use strictly necessary storage to run this site (for example, remembering this choice). With your permission we would also use analytics cookies to understand how the site is used. Nothing non-essential loads until you accept. See our <Link to="/privacy#cookies" className="underline hover:text-white">Privacy Policy</Link>.
+        <p id="cookie-desc" className="mt-2 text-sm text-zinc-400 hidden sm:block">
+          We use strictly necessary storage to run this site (for example, remembering this choice). Analytics stays off until you accept, and rejecting is the same kind of choice. See our <Link to="/privacy#cookies" className="underline hover:text-white">Privacy Policy</Link>.
         </p>
+        {browserOptOut && <p className="mt-2 text-sm text-zinc-300">Your browser is sending a privacy signal, so analytics stays off.</p>}
         {custom && (
           <div className="mt-4 space-y-3 rounded-xl border border-white/10 p-4 text-sm">
             <label className="flex items-start gap-3 text-zinc-300"><input type="checkbox" checked disabled className="mt-1 h-4 w-4" /><span><b className="text-white">Strictly necessary</b> · always on. Required for the site, checkout links, and your cookie choice.</span></label>
@@ -46,8 +53,8 @@ export default function CookieConsent() {
           {custom
             ? <button type="button" onClick={() => decide(analytics)} className="btn-ghost !py-2">Save choices</button>
             : <button type="button" onClick={() => setCustom(true)} className="btn-ghost !py-2">Customize</button>}
-          <button type="button" onClick={() => decide(false)} className="btn-ghost !py-2"><span className="sm:hidden">Reject</span><span className="hidden sm:inline">Reject non-essential</span></button>
-          <button type="button" onClick={() => decide(true)} className="btn-primary !py-2 !shadow-none">Accept all</button>
+          <button type="button" onClick={() => decide(false)} className="btn-ghost !py-2">Reject</button>
+          <button type="button" onClick={() => decide(true)} className="btn-ghost !py-2">Accept analytics</button>
         </div>
       </div>
     </div>

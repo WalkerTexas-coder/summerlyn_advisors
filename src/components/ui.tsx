@@ -2,6 +2,7 @@ import { ReactNode, useState } from 'react';
 import type { PhotoCredit } from '../data/photoCredits';
 import { Link } from 'react-router-dom';
 import { faqs as defaultFaqs, sampleRow, activeDailyTiers, daily5Steps, dailyCommonFeatures, DailyTier, SIGNUP_PATH } from '../data/callListOffer';
+import { trackCta } from '../lib/posthog';
 
 export function PageHeader({ eyebrow, title, children }: { eyebrow: string; title: ReactNode; children?: ReactNode }) {
   return (
@@ -66,7 +67,7 @@ export function DailyTierCard({ d }: { d: DailyTier }) {
       <p className="mt-1 text-xs text-zinc-400 min-h-[2rem]">{d.tagline}</p>
       <p className="mt-4 text-white"><span className="text-4xl font-semibold">${d.price!.toLocaleString()}</span><span className="text-zinc-400"> / {d.cadence}</span></p>
       <ul className="mt-4 space-y-1 text-sm text-zinc-300 flex-1">{d.features.map((f) => <li key={f} className="flex gap-2"><span className="text-cyan-300">✓</span>{f}</li>)}</ul>
-      <Link to={`${SIGNUP_PATH}?tier=${d.id}`} className={`${d.featured ? 'btn-primary' : 'btn-ghost'} mt-6 justify-center`}>Sign up · {d.name} →</Link>
+      <Link to={`${SIGNUP_PATH}?tier=${d.id}`} onClick={() => trackCta('signup')} className={`${d.featured ? 'btn-primary' : 'btn-ghost'} mt-6 justify-center`}>Sign up · {d.name} →</Link>
     </div>
   );
 }
@@ -132,7 +133,7 @@ export function CTA() {
         <h2 className="h-section max-w-3xl mx-auto">Stop digging through the CRM. <span className="serif-accent">Start calling.</span></h2>
         <p className="lead mt-5 max-w-xl mx-auto">Researched prospects, a reason to call each one, and the words to say. On your calendar every weekday morning.</p>
         <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
-          <Link to={SIGNUP_PATH} className="btn-primary">Sign up · from $199/mo</Link>
+          <Link to={SIGNUP_PATH} onClick={() => trackCta('signup')} className="btn-primary">Sign up · from $199/mo</Link>
           <Link to="/call-list#pricing" className="btn-ghost">Compare plans</Link>
         </div>
         <p className="mt-6 text-sm text-zinc-500">Questions first? <Link to="/contact" className="underline hover:text-white">Talk to us</Link>.</p>

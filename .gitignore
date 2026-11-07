@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Paid digital products. Never commit the buyer zip or its unpacked contents.
+*Implementation-Bundle*.zip
+Summerlyn-Advisors-Implementation-Bundle/

@@ -1,3 +1,5 @@
+import { syncPostHog } from './posthog';
+
 export type Consent = { necessary: true; analytics: boolean; decidedAt: string };
 const KEY = 'summerlyn_cookie_consent_v1';
 export const CONSENT_EVENT = 'summerlyn:consent-changed';
@@ -9,13 +11,14 @@ export function getConsent(): Consent | null {
 export function setConsent(analytics: boolean) {
   const c: Consent = { necessary: true, analytics, decidedAt: new Date().toISOString() };
   try { localStorage.setItem(KEY, JSON.stringify(c)); } catch { /* ignore */ }
+  loadAnalytics();
   window.dispatchEvent(new CustomEvent(CONSENT_EVENT, { detail: c }));
-  if (analytics) loadAnalytics();
 }
 
 let loaded = false;
 /** Loads non-essential analytics ONLY after opt-in. No analytics provider is configured yet (VITE_ANALYTICS_SRC). */
 export function loadAnalytics() {
+  syncPostHog(getConsent()?.analytics === true);
   if (loaded || !getConsent()?.analytics) return;
   const src = import.meta.env.VITE_ANALYTICS_SRC as string | undefined;
   if (!src) return;
